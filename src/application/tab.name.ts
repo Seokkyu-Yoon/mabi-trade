@@ -1,0 +1,5 @@
+export const TAB_ALL = Symbol('all')
+export const TAB_OASIS = Symbol('oasis')
+export const TAB_KARU_FOREST = Symbol('karu_forest')
+export const TAB_KALIDA_LAKE = Symbol('kalida_lake')
+export const TAB_PERA_VOLCANO = Symbol('pera_volcano')
