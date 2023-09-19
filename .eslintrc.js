@@ -4,30 +4,16 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    'standard-with-typescript',
-    'plugin:vue/vue3-recommended',
-    'prettier',
-  ],
-  overrides: [
-    // {
-    //   env: {
-    //     node: true,
-    //   },
-    //   files: ['.eslintrc.{js,cjs}'],
-    //   parserOptions: {
-    //     sourceType: 'script',
-    //   },
-    // },
-  ],
+  extends: ['plugin:vue/vue3-essential', 'standard', 'prettier'],
   parserOptions: {
     ecmaVersion: 'latest',
+    parser: '@typescript-eslint/parser',
     sourceType: 'module',
   },
   global: {
     NodeJS: true,
   },
-  plugins: ['vue', 'prettier'],
+  plugins: ['vue', '@typescript-eslint', 'prettier'],
   rules: {
     'prettier/prettier': 'error',
   },

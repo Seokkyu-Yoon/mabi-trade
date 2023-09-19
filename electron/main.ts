@@ -10,27 +10,21 @@ import path from 'node:path'
 // │ │ ├── main.js
 // │ │ └── preload.js
 // │
-process.env.DIST = path.join(__dirname, '../dist')
-process.env.VITE_PUBLIC = app.isPackaged
-  ? process.env.DIST
-  : path.join(process.env.DIST, '../public')
+const envDist = path.join(__dirname, '../dist')
+const envVitePublic = app.isPackaged ? envDist : path.join(envDist, '../public')
 
 let win: BrowserWindow | null
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 function createWindow() {
-  const vitePublic = process.env.VITE_PUBLIC
-
-  if (typeof vitePublic === 'undefined') {
-    throw new Error('process.env.VITE_PUBLIC is undefined')
-  }
   win = new BrowserWindow({
-    icon: path.join(vitePublic, 'electron-vite.svg'),
+    icon: path.join(envVitePublic, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
   })
+  win.webContents.openDevTools()
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
@@ -40,12 +34,8 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
-    const dist = process.env.DIST
-    if (typeof dist === 'undefined') {
-      throw new Error('process.env.DIST is undeinf')
-    }
     // win.loadFile('dist/index.html')
-    win.loadFile(path.join(dist, 'index.html'))
+    win.loadFile(path.join(envDist, 'index.html'))
   }
 }
 

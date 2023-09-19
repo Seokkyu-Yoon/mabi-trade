@@ -22,7 +22,6 @@ function withPrototype(obj: Record<string, any>) {
   return obj
 }
 
-type DocumentReadyState = 'complete' | 'interactive' | 'loading'
 // --------- Preload scripts loading ---------
 function domReady(
   condition: DocumentReadyState[] = ['complete', 'interactive'],

@@ -1,5 +1,6 @@
+/// <reference types="vite-plugin-electron/electron-env" />
+
 import { IpcRenderer } from 'electron'
-import 'vite-plugin-electron/electron-env'
 
 declare namespace NodeJS {
   interface ProcessEnv {
@@ -26,3 +27,5 @@ declare namespace NodeJS {
 interface Window {
   ipcRenderer: IpcRenderer
 }
+
+export {}
