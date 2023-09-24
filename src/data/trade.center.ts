@@ -1,20 +1,66 @@
 import { Place } from '@/vite-env'
-import { Item, ItemCollection } from './item'
+import { Item, ItemCollection, ItemName } from './item'
 
 const itemCollection = ItemCollection.getInstance()
 
+const oasis1 = '고운 모래'
+const oasis2 = '프리즌 고스트의 날개'
+const oasis3 = '오아시스 그림'
+const oasis4 = '선인장 꽃'
+const oasis5 = '거대 송곳니 화석'
+
+const karuForest1 = '우드 테이블'
+const karuForest2 = '목공예품'
+const karuForest3 = '스톤 홀스 조각상'
+const karuForest4 = '카루 표고 버섯'
+const karuForest5 = '조개 껍질 화석'
+
+const kalidaLake1 = '맥반석 계란'
+const kalidaLake2 = '칼리다 연어'
+const kalidaLake3 = '온천 입욕제'
+const kalidaLake4 = '대형 캠핑 텐트'
+const kalidaLake5 = '핑크 솔트'
+
+const peraVolcano1 = '화산 머드팩'
+const peraVolcano2 = '마그마 스톤'
+const peraVolcano3 = '익시온의 뿔'
+const peraVolcano4 = '화산 도마뱀의 알'
+const peraVolcano5 = '라스파 흑표범의 가죽'
+
+export type TradeName =
+  | typeof oasis1
+  | typeof oasis2
+  | typeof oasis3
+  | typeof oasis4
+  | typeof oasis5
+  | typeof karuForest1
+  | typeof karuForest2
+  | typeof karuForest3
+  | typeof karuForest4
+  | typeof karuForest5
+  | typeof kalidaLake1
+  | typeof kalidaLake2
+  | typeof kalidaLake3
+  | typeof kalidaLake4
+  | typeof kalidaLake5
+  | typeof peraVolcano1
+  | typeof peraVolcano2
+  | typeof peraVolcano3
+  | typeof peraVolcano4
+  | typeof peraVolcano5
+
 export class TradeCenter {
   place: Place
-  tradeInfo: Map<string, TradeInfo>
+  tradeInfos: Map<TradeName, TradeInfo>
 
-  private constructor(place: Place, tradeInfo: Map<string, TradeInfo>) {
+  private constructor(place: Place, tradeInfo: Map<TradeName, TradeInfo>) {
     this.place = place
-    this.tradeInfo = tradeInfo
+    this.tradeInfos = tradeInfo
   }
   static Builder() {
     class B {
       private place!: Place
-      private tradeInfo: Map<string, TradeInfo> = new Map()
+      private tradeInfo: Map<TradeName, TradeInfo> = new Map()
 
       setPlace(place: Place) {
         this.place = place
@@ -32,19 +78,19 @@ export class TradeCenter {
   }
 }
 
-class TradeInfo {
-  name: string
+export class TradeInfo {
+  name: TradeName
   weight: number
   slotCount: number
   weekendCount: number
-  items: Map<string, number>
+  items: Map<ItemName, number>
 
   private constructor(
-    name: string,
+    name: TradeName,
     weight: number,
     slotCount: number,
     weekendCount: number,
-    items: Map<string, number>,
+    items: Map<ItemName, number>,
   ) {
     this.name = name
     this.weight = weight
@@ -55,13 +101,13 @@ class TradeInfo {
 
   public static Builder() {
     class B {
-      private name!: string
+      private name!: TradeName
       private weight!: number
       private slotCount!: number
       private weekendCount!: number
-      private items: Map<string, number> = new Map()
+      private items: Map<ItemName, number> = new Map()
 
-      setName(name: string) {
+      setName(name: TradeName) {
         this.name = name
         return this
       }
@@ -128,7 +174,7 @@ const tradeCenterOasis = TradeCenter.Builder()
   .setPlace('oasis')
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('고운 모래')
+      .setName(oasis1)
       .setWeekendCount(25)
       .setSlotCount(10)
       .setWeight(15)
@@ -138,7 +184,7 @@ const tradeCenterOasis = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('프리즌 고스트의 날개')
+      .setName(oasis2)
       .setWeekendCount(15)
       .setSlotCount(7)
       .setWeight(15)
@@ -148,7 +194,7 @@ const tradeCenterOasis = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('오아시스 그림')
+      .setName(oasis3)
       .setWeekendCount(10)
       .setSlotCount(7)
       .setWeight(20)
@@ -158,7 +204,7 @@ const tradeCenterOasis = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('선인장 꽃')
+      .setName(oasis4)
       .setWeekendCount(8)
       .setSlotCount(7)
       .setWeight(25)
@@ -169,7 +215,7 @@ const tradeCenterOasis = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('거대 송곳니 화석')
+      .setName(oasis5)
       .setWeekendCount(3)
       .setSlotCount(5)
       .setWeight(30)
@@ -184,7 +230,7 @@ const tradeCenterKaruForest = TradeCenter.Builder()
   .setPlace('karuForest')
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('우드 테이블')
+      .setName(karuForest1)
       .setWeekendCount(25)
       .setSlotCount(10)
       .setWeight(15)
@@ -194,7 +240,7 @@ const tradeCenterKaruForest = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('목공예품')
+      .setName(karuForest2)
       .setWeekendCount(15)
       .setSlotCount(7)
       .setWeight(15)
@@ -204,7 +250,7 @@ const tradeCenterKaruForest = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('스톤 홀스 조각상')
+      .setName(karuForest3)
       .setWeekendCount(10)
       .setSlotCount(7)
       .setWeight(20)
@@ -214,7 +260,7 @@ const tradeCenterKaruForest = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('카루 표고 버섯')
+      .setName(karuForest4)
       .setWeekendCount(8)
       .setSlotCount(7)
       .setWeight(25)
@@ -225,7 +271,7 @@ const tradeCenterKaruForest = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('조개 껍질 화석')
+      .setName(karuForest5)
       .setWeekendCount(3)
       .setSlotCount(5)
       .setWeight(30)
@@ -240,7 +286,7 @@ const tradeCenterKalidaLake = TradeCenter.Builder()
   .setPlace('kalidaLake')
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('맥반석 계란')
+      .setName(kalidaLake1)
       .setWeekendCount(25)
       .setSlotCount(10)
       .setWeight(15)
@@ -250,7 +296,7 @@ const tradeCenterKalidaLake = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('칼리다 연어')
+      .setName(kalidaLake2)
       .setWeekendCount(15)
       .setSlotCount(7)
       .setWeight(15)
@@ -260,7 +306,7 @@ const tradeCenterKalidaLake = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('온천 입욕제')
+      .setName(kalidaLake3)
       .setWeekendCount(10)
       .setSlotCount(7)
       .setWeight(20)
@@ -270,7 +316,7 @@ const tradeCenterKalidaLake = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('대형 캠핑 텐트')
+      .setName(kalidaLake4)
       .setWeekendCount(8)
       .setSlotCount(7)
       .setWeight(25)
@@ -281,7 +327,7 @@ const tradeCenterKalidaLake = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('핑크 솔트')
+      .setName(kalidaLake5)
       .setWeekendCount(3)
       .setSlotCount(5)
       .setWeight(30)
@@ -296,7 +342,7 @@ const tradeCenterPeraVolcano = TradeCenter.Builder()
   .setPlace('peraVolcano')
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('화산 머드팩')
+      .setName(peraVolcano1)
       .setWeekendCount(25)
       .setSlotCount(10)
       .setWeight(15)
@@ -306,7 +352,7 @@ const tradeCenterPeraVolcano = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('마그마 스톤')
+      .setName(peraVolcano2)
       .setWeekendCount(15)
       .setSlotCount(7)
       .setWeight(15)
@@ -316,7 +362,7 @@ const tradeCenterPeraVolcano = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('익시온의 뿔')
+      .setName(peraVolcano3)
       .setWeekendCount(10)
       .setSlotCount(7)
       .setWeight(20)
@@ -326,7 +372,7 @@ const tradeCenterPeraVolcano = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('화산 도마뱀의 알')
+      .setName(peraVolcano4)
       .setWeekendCount(8)
       .setSlotCount(7)
       .setWeight(25)
@@ -337,7 +383,7 @@ const tradeCenterPeraVolcano = TradeCenter.Builder()
   )
   .addTradeInfo(
     TradeInfo.Builder()
-      .setName('라스파 흑표범의 가죽')
+      .setName(peraVolcano5)
       .setWeekendCount(3)
       .setSlotCount(5)
       .setWeight(30)

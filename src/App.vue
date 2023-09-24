@@ -1,8 +1,19 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, inject } from 'vue-router'
+import PopupLauncher from '@/components/PopupLauncher.vue'
+import { Component, onMounted, ref } from 'vue'
+
+const refPopupLauncher = ref<Component | null>(null)
+onMounted(() => {
+  console.log(refPopupLauncher.value)
+  const popupLauncher = refPopupLauncher.value
+  if (popupLauncher === null) return
+  popupLauncher.push('test')
+})
 </script>
 
 <template>
+  <popup-launcher-vue ref="refPopupLauncher" />
   <router-view />
 </template>
 
@@ -13,6 +24,8 @@ import { RouterView } from 'vue-router'
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  text-align: left;
+  user-select: none;
 }
 
 *:focus {

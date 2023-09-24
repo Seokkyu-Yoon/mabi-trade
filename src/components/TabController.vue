@@ -6,15 +6,18 @@ import {
   TAB_KARU_FOREST,
   TAB_KALIDA_LAKE,
   TAB_PERA_VOLCANO,
+  TAB_TYPES,
 } from '@/application/tab.name'
 const props = defineProps<{
-  name: symbol
+  name: TAB_TYPES
 }>()
 
 const propName = computed(() => props?.name)
 const name = ref(props?.name)
-const emits = defineEmits<{ (event: 'update:name', payload: symbol): void }>()
-const emitTab = function (value: symbol) {
+const emits = defineEmits<{
+  (event: 'update:name', payload: TAB_TYPES): void
+}>()
+const emitTab = function (value: TAB_TYPES) {
   if (value === name.value) return
   return emits('update:name', value)
 }

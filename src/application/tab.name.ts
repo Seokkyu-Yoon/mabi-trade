@@ -1,5 +1,7 @@
-export const TAB_ALL = Symbol('all')
-export const TAB_OASIS = Symbol('oasis')
-export const TAB_KARU_FOREST = Symbol('karu_forest')
-export const TAB_KALIDA_LAKE = Symbol('kalida_lake')
-export const TAB_PERA_VOLCANO = Symbol('pera_volcano')
+import { Place } from '@/vite-env'
+export type TAB_TYPES = Place | 'all'
+export const TAB_ALL: TAB_TYPES = 'all'
+export const TAB_OASIS: TAB_TYPES = 'oasis'
+export const TAB_KARU_FOREST: TAB_TYPES = 'karuForest'
+export const TAB_KALIDA_LAKE: TAB_TYPES = 'kalidaLake'
+export const TAB_PERA_VOLCANO: TAB_TYPES = 'peraVolcano'
