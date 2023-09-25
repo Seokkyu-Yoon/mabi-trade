@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, inject, Ref } from 'vue'
+import { v4 as uuidv4 } from 'uuid'
 
 import { ItemCollection, ItemName } from '@/data/item'
 import { TradeInfo } from '@/data/trade.center'
 
-import PopupLauncherVue from './PopupLauncher.vue'
+import { PopupListener } from '@/application/popup.listener'
 
 const itemCollection = ItemCollection.getInstance()
 
@@ -12,6 +13,8 @@ const props = defineProps<{
   tradeInfo: TradeInfo
   traded?: number
 }>()
+
+const popupListener = PopupListener.getInstance()
 
 const tradeInfo = computed(() => props.tradeInfo)
 const traded = computed(() => props?.traded || 0)
@@ -22,7 +25,11 @@ function toggleVisibleItems() {
 
 function showItemPopup(itemName: ItemName) {
   const item = itemCollection.get(itemName)
-  window.alert(item.descriptions.join('\n'))
+  popupListener.emit({
+    id: uuidv4(),
+    title: item.name,
+    msgs: item.descriptions,
+  })
 }
 </script>
 
@@ -52,7 +59,6 @@ function showItemPopup(itemName: ItemName) {
       </p>
     </div>
   </div>
-  <popup-launcher-vue />
 </template>
 
 <style scoped lang="scss">

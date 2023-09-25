@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import { RouterView, inject } from 'vue-router'
-import PopupLauncher from '@/components/PopupLauncher.vue'
-import { Component, onMounted, ref } from 'vue'
-
-const refPopupLauncher = ref<Component | null>(null)
-onMounted(() => {
-  console.log(refPopupLauncher.value)
-  const popupLauncher = refPopupLauncher.value
-  if (popupLauncher === null) return
-  popupLauncher.push('test')
-})
+import { RouterView } from 'vue-router'
+import PopupLauncherVue from '@/components/PopupLauncher.vue'
 </script>
 
 <template>
-  <popup-launcher-vue ref="refPopupLauncher" />
+  <popup-launcher-vue />
   <router-view />
 </template>
 
