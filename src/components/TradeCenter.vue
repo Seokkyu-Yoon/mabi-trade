@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { TradeCenter } from '@/data/trade.center'
-import { useTradeStore } from '@/stores/trade'
 import { Place } from '@/vite-env'
 import { computed } from 'vue'
 
@@ -10,8 +9,6 @@ const props = defineProps<{
   tradeCenter: TradeCenter
   showPlace: boolean
 }>()
-
-const tradeStore = useTradeStore()
 
 const tradeCenter = computed(() => props.tradeCenter)
 const tradeInfos = computed(() => [...tradeCenter.value.tradeInfos.values()])
@@ -32,8 +29,8 @@ PLACE_LABELS.set('peraVolcano', '페라 화산')
     <trade-info-vue
       v-for="(tradeInfo, idx) in tradeInfos"
       :key="`${tradeCenter.place}-${idx}`"
+      :place="tradeCenter.place"
       :tradeInfo="tradeInfo"
-      :traded="tradeStore.get(tradeCenter.place, tradeInfo.name)"
     />
   </div>
 </template>

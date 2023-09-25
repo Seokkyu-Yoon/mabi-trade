@@ -73,11 +73,9 @@ export class Queue<T> {
   }
 
   private getItemFromHead(idx: number) {
-    console.log('getItemFromHead')
     let i = 0
     let item: IItem<T> | null = this.head
     while (i < idx) {
-      console.log(i, idx)
       item = item?.next || null
       i += 1
     }
@@ -85,11 +83,9 @@ export class Queue<T> {
   }
 
   private getItemFromTail(idx: number) {
-    console.log('getItemFromTail')
     let i = this.count - 1
     let item: IItem<T> | null = this.tail
     while (i > idx) {
-      console.log(i, idx)
       item = item?.prev || null
       i -= 1
     }
@@ -104,9 +100,7 @@ export class Queue<T> {
   }
 
   public delete(idx: number) {
-    console.log(idx, this.count)
     const item = this.getItemBy(idx)
-    console.log(item?.value || null)
     if (item === null) return false
 
     if (item.prev !== null) {

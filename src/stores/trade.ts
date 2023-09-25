@@ -1,6 +1,7 @@
 import { TradeName } from '@/data/trade.center'
 import { Place } from '@/vite-env'
 import { defineStore } from 'pinia'
+import { InjectionKey } from 'vue'
 
 const ID = 'tradeStore'
 const VERSION = 'v0.1'

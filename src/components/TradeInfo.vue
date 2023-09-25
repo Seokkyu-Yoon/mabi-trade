@@ -2,22 +2,29 @@
 import { computed, ref, inject, Ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 
+import { useTradeStore } from '@/stores/trade'
 import { ItemCollection, ItemName } from '@/data/item'
 import { TradeInfo } from '@/data/trade.center'
 
-import { PopupListener } from '@/application/popup.listener'
+import { SidePopupListener } from '@/application/side.popup.listener'
+import { Place } from '@/vite-env'
 
 const itemCollection = ItemCollection.getInstance()
+const tradeStore = useTradeStore()
 
 const props = defineProps<{
+  place: Place
   tradeInfo: TradeInfo
-  traded?: number
 }>()
 
-const popupListener = PopupListener.getInstance()
+const sidePopupListener = SidePopupListener.getInstance()
 
+const place = computed(() => props.place)
 const tradeInfo = computed(() => props.tradeInfo)
-const traded = computed(() => props?.traded || 0)
+const traded = computed(
+  () => tradeStore.get(place.value, tradeInfo.value.name) || 0,
+)
+
 const visibleItems = ref(false)
 function toggleVisibleItems() {
   visibleItems.value = !visibleItems.value
@@ -25,11 +32,26 @@ function toggleVisibleItems() {
 
 function showItemPopup(itemName: ItemName) {
   const item = itemCollection.get(itemName)
-  popupListener.emit({
+  sidePopupListener.emit({
     id: uuidv4(),
     title: item.name,
     msgs: item.descriptions,
   })
+}
+
+function addTraded() {
+  tradeStore.set(
+    place.value,
+    tradeInfo.value.name,
+    Math.min(traded.value + 1, tradeInfo.value.weekendCount),
+  )
+}
+function subTraded() {
+  tradeStore.set(
+    place.value,
+    tradeInfo.value.name,
+    Math.max(traded.value - 1, 0),
+  )
 }
 </script>
 
@@ -39,14 +61,18 @@ function showItemPopup(itemName: ItemName) {
       {{ tradeInfo.name }}
     </h1>
     <div class="wrap">
-      <span class="desc">무게 / 슬롯당 최대갯수(개)</span>
-      <span class="value"
-        >{{ tradeInfo.weight }} / {{ tradeInfo.slotCount }}개</span
-      >
+      <span class="desc"> 무게 / 슬롯당 최대갯수 (개) </span>
+      <span class="value">
+        {{ tradeInfo.weight }} / {{ tradeInfo.slotCount }}개
+      </span>
     </div>
     <div class="wrap">
-      <span class="desc">주간 판매횟수 / 최대 판매횟수</span>
-      <span class="value">{{ traded }} / {{ tradeInfo.weekendCount }}</span>
+      <span class="desc">주간 판매횟수 (최대 판매횟수)</span>
+      <div>
+        <button class="add" @click.stop="addTraded">+</button>
+        {{ traded }}<span>({{ tradeInfo.weekendCount }})</span>
+        <button class="sub" @click.stop="subTraded">-</button>
+      </div>
     </div>
 
     <div v-if="visibleItems" class="items">
@@ -101,10 +127,39 @@ function showItemPopup(itemName: ItemName) {
       color: #888;
     }
 
-    > .value {
+    > div {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       font-size: 16px;
+      font-weight: 600;
       letter-spacing: -0.3px;
       color: #333;
+
+      > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        color: #fff;
+        border-radius: 4px;
+
+        &.add {
+          background-color: #5c7;
+        }
+
+        &.sub {
+          background-color: #c75;
+        }
+      }
+
+      > span {
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.5px;
+        color: #888;
+      }
     }
   }
 

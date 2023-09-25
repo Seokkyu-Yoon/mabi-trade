@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { PopupListener, PopupMsg } from '@/application/popup.listener'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { SidePopupListener, PopupMsg } from '@/application/side.popup.listener'
 import { Queue } from '@/application/queue'
 
 const popupMsgQueue = new Queue<PopupMsg>()
-const popupListener = PopupListener.getInstance()
+const sidePopupListener = SidePopupListener.getInstance()
 
 const popupMsgs = ref<PopupMsg[]>(popupMsgQueue.toArray())
 const refPopupLauncher = ref<HTMLElement | null>(null)
@@ -30,10 +30,10 @@ function popWhileOverflow() {
   popupMsgs.value = popupMsgQueue.toArray()
 }
 onMounted(() => {
-  popupListener.on(onPopupMsg)
+  sidePopupListener.on(onPopupMsg)
 })
 onUnmounted(() => {
-  popupListener.off(onPopupMsg)
+  sidePopupListener.off(onPopupMsg)
 })
 </script>
 

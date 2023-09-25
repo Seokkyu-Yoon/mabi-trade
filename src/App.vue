@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import PopupLauncherVue from '@/components/PopupLauncher.vue'
+import SidePopupLauncherVue from '@/components/SidePopupLauncher.vue'
 </script>
 
 <template>
-  <popup-launcher-vue />
+  <side-popup-launcher-vue />
   <router-view />
 </template>
 
