@@ -48,6 +48,7 @@ function closeTradeStorePopupTransition() {
 }
 function resetTradeStore() {
   tradeStore.reset()
+  closeTradeStorePopupTransition()
 }
 </script>
 
@@ -118,7 +119,7 @@ function resetTradeStore() {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
 
     &[visible='false'] {
       display: none;

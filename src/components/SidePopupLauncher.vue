@@ -29,11 +29,18 @@ function popWhileOverflow() {
   popupMsgQueue.pop()
   popupMsgs.value = popupMsgQueue.toArray()
 }
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key.toLowerCase() !== 'd') return
+  hideMsgs(0)
+}
 onMounted(() => {
   sidePopupListener.on(onPopupMsg)
+  window.addEventListener('keydown', onKeydown)
 })
 onUnmounted(() => {
   sidePopupListener.off(onPopupMsg)
+  window.removeEventListener('keydown', onKeydown)
 })
 </script>
 
@@ -44,7 +51,8 @@ onUnmounted(() => {
         name="list"
         tag="div"
         mode="out-in"
-        @before-enter="popWhileOverflow"
+        @enter="popWhileOverflow"
+        @after-leave="popWhileOverflow"
       >
         <div
           class="popup"
@@ -54,7 +62,6 @@ onUnmounted(() => {
         >
           <div class="header">
             <p>{{ popupMsg.title || '' }}</p>
-            <!-- <button class="close" @click="() => hideMsgs(idxMsg1d)">x</button> -->
           </div>
           <p
             v-for="(msg, idxMsg) in popupMsg.msgs"
@@ -88,7 +95,7 @@ onUnmounted(() => {
         width: 100%;
         margin: 6px 0 0 auto;
         border-radius: 10px;
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 0, 0, 0.7);
         color: #fff;
         padding: 4px 8px;
         gap: 4px;
@@ -113,15 +120,20 @@ onUnmounted(() => {
         > p {
           width: 100%;
           text-align: left;
+          font-size: 12px;
+          letter-spacing: -0.25px;
+          white-space: pre-wrap;
         }
       }
     }
   }
 }
 
-.list-enter-active,
-.list-leave-active {
+.list-enter-active {
   transition: all 0.5s ease;
+}
+.list-leave-active {
+  transition: all 0.3s ease;
 }
 .list-enter-from,
 .list-leave-to {

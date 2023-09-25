@@ -56,7 +56,12 @@ function subTraded() {
 </script>
 
 <template>
-  <div class="trade-info" :active="visibleItems" @click="toggleVisibleItems">
+  <div
+    class="trade-info"
+    :active="visibleItems"
+    :ended="traded === tradeInfo.weekendCount"
+    @click="toggleVisibleItems"
+  >
     <h1>
       {{ tradeInfo.name }}
     </h1>
@@ -76,13 +81,34 @@ function subTraded() {
     </div>
 
     <div v-if="visibleItems" class="items">
-      <p
-        v-for="[itemName, count] in tradeInfo.items"
-        class="item"
-        @click.stop="() => showItemPopup(itemName)"
-      >
-        {{ itemName }}: {{ count }}개
-      </p>
+      <div>
+        <p class="head">품목</p>
+        <p
+          v-for="([itemName], idx) in tradeInfo.items"
+          :key="`${itemName}-${idx}-name`"
+          @click.stop="() => showItemPopup(itemName)"
+        >
+          {{ itemName }}
+        </p>
+      </div>
+      <div>
+        <p class="head">1회 제작 재료</p>
+        <p
+          v-for="([itemName, count], idx) in tradeInfo.items"
+          :key="`${itemName}-${idx}-once`"
+        >
+          {{ count }}개
+        </p>
+      </div>
+      <div>
+        <p class="head">남은 제작 재료</p>
+        <p
+          v-for="([itemName, count], idx) in tradeInfo.items"
+          :key="`${itemName}-${idx}-remain`"
+        >
+          {{ count * (tradeInfo.weekendCount - traded) }}개
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -110,6 +136,11 @@ function subTraded() {
     }
   }
 
+  &[ended='true'] {
+    background-color: #ccc;
+    border: 1px solid #ccc;
+  }
+
   > h1 {
     font-size: 18px;
     font-weight: 600;
@@ -124,7 +155,7 @@ function subTraded() {
     > .desc {
       font-size: 13px;
       letter-spacing: -0.5px;
-      color: #888;
+      color: #555;
     }
 
     > div {
@@ -158,7 +189,7 @@ function subTraded() {
         font-size: 14px;
         font-weight: 500;
         letter-spacing: -0.5px;
-        color: #888;
+        color: #555;
       }
     }
   }
@@ -168,12 +199,33 @@ function subTraded() {
     background-color: #fff;
     padding: 4px 8px;
     border-radius: 4px;
-    color: #35f;
     letter-spacing: -0.75px;
-    text-decoration: underline;
+    display: flex;
 
-    > p {
-      width: fit-content;
+    > div {
+      border-left: 1px solid #ccc;
+
+      &:nth-child(1) {
+        border-left: none;
+        > p {
+          color: #35f;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+      }
+
+      p {
+        padding: 4px 8px;
+
+        &.head {
+          color: #333;
+          font-weight: 600;
+          text-decoration: none;
+          cursor: default;
+          text-align: center;
+          border-bottom: 1px solid #ccc;
+        }
+      }
     }
   }
 }
