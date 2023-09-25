@@ -8,7 +8,7 @@ import {
   TAB_PERA_VOLCANO,
 } from '@/application/tab.name'
 
-import { TradeCenter, TradeCenterCollection } from '@/data/trade.center'
+import { TradeCenterCollection } from '@/data/trade.center'
 
 import TabControllerVue from '@/components/TabController.vue'
 import TradeCenterVue from '@/components/TradeCenter.vue'

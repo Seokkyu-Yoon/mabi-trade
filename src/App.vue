@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import SidePopupLauncherVue from '@/components/SidePopupLauncher.vue'
+import MainVue from '@/views/Main.vue'
 </script>
 
 <template>
   <side-popup-launcher-vue />
-  <router-view />
+  <main-vue />
 </template>
 
 <style lang="scss">
