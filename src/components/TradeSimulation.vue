@@ -1,18 +1,27 @@
 <script setup lang="ts">
-import {
-  TradeItem,
-  TradeItemCollection,
-  TradeItemName,
-} from '@/data/trade.item'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { TradeItemCollection } from '@/data/trade.item'
 import { TradePartnerCollection } from '@/data/trade.partner'
 import { TradeVehicleCollection } from '@/data/trade.vehicle'
-import { useTradeStore } from '@/stores/trade'
+import { TradeCenterCollection } from '@/data/trade.center'
+import { TradeSimulator } from '@/application/trade.simulator'
+
 import { useUserStore } from '@/stores/user'
-import { computed, reactive, ref, watch } from 'vue'
+
+import SimulatorPopupLauncherVue from './SimulatorPopupLauncher.vue'
+import TradeCenterVue from './TradeCenter.vue'
+import PopupVue from './Popup.vue'
+
+const props = defineProps<{
+  visible: boolean
+}>()
+
+const visible = computed(() => props.visible)
 
 const userStore = useUserStore()
 const tradePartnerCollection = TradePartnerCollection.getInstance()
 const tradeVehicleCollection = TradeVehicleCollection.getInstance()
+const tradeCenterCollection = TradeCenterCollection.getInstance()
 
 const tradePartners = tradePartnerCollection.getPartners()
 const tradeVehicles = tradeVehicleCollection.getVehicles()
@@ -23,12 +32,15 @@ const tradeVehicleName = ref(userStore.record.tradeVehicleName)
 
 watch(isGrandMasterMerchant, (grandMasterMerchant) => {
   userStore.setGrandMasterMerchant(grandMasterMerchant)
+  tradeSimulator.reset()
 })
 watch(tradePartnerType, (newTradePartnerType) => {
   userStore.setTradePartnerType(newTradePartnerType)
+  tradeSimulator.reset()
 })
 watch(tradeVehicleName, (newTradeVehicleName) => {
   userStore.setTradeVehicleName(newTradeVehicleName)
+  tradeSimulator.reset()
 })
 
 function toggleGrandMasterMerchat() {
@@ -56,73 +68,77 @@ const totalSlot = computed(() => {
   )
 })
 
-const tradeStore = useTradeStore()
 const tradeItemCollection = TradeItemCollection.getInstance()
-class Pocket {
-  tradeItems: Map<TradeItemName, number> = new Map()
-  weight: number = 0
-  slot: number = 0
+const tradeSimulator: TradeSimulator = reactive<TradeSimulator>(
+  new TradeSimulator(),
+)
+const pickedTradeItems = computed(() =>
+  tradeSimulator.getTradeItems().map(([tradeItemName, count]) => {
+    const tradeItem = tradeItemCollection.get(tradeItemName)
+    return { tradeItem, count }
+  }),
+)
+watch(totalWeight, (newTotalWeight) => {
+  tradeSimulator.setTotalWeight(newTotalWeight)
+})
+watch(totalSlot, (newTotalSlot) => {
+  tradeSimulator.setTotalSlot(newTotalSlot)
+})
+onMounted(() => {
+  tradeSimulator.setTotalWeight(totalWeight.value)
+  tradeSimulator.setTotalSlot(totalSlot.value)
+})
 
-  getCount(tradeItemName: TradeItemName) {
-    return this.tradeItems.get(tradeItemName) || 0
-  }
-
-  private overflowCount(tradeItem: TradeItem, newPocketCount: number) {
-    return (
-      newPocketCount + tradeStore.get(tradeItem.name) >= tradeItem.weekendCount
-    )
-  }
-  private overflowWeight(tradeItem: TradeItem) {
-    return this.weight + tradeItem.weight > totalWeight.value
-  }
-  private overflowSlot(slotDiff: number) {
-    return this.slot + slotDiff > totalSlot.value
-  }
-
-  addTradeItem(tradeItem: TradeItem) {
-    const pocketCount = this.getCount(tradeItem.name)
-    const newPocketCount = pocketCount + 1
-    const slotDiff =
-      Math.ceil(newPocketCount / tradeItem.slotCount) -
-      Math.ceil(pocketCount / tradeItem.slotCount)
-    if (this.overflowCount(tradeItem, newPocketCount)) {
-      console.log('주간 구매 횟수 초과')
-      return
-    }
-    if (this.overflowWeight(tradeItem)) {
-      console.log('무게 초과')
-      return
-    }
-    if (this.overflowSlot(slotDiff)) {
-      console.log('슬롯 초과')
-      return
-    }
-    this.weight += tradeItem.weight
-    this.slot += slotDiff
-    this.tradeItems.set(tradeItem.name, newPocketCount)
-  }
-  subTradeItem(tradeItem: TradeItem) {
-    const pocketCount = this.getCount(tradeItem.name)
-    const newPocketCount = pocketCount - 1
-    const slotDiff =
-      Math.ceil(newPocketCount / tradeItem.slotCount) -
-      Math.ceil(pocketCount / tradeItem.slotCount)
-    if (newPocketCount < 0) return
-    this.weight -= tradeItem.weight
-    this.slot += slotDiff
-
-    if (newPocketCount === 0) {
-      this.tradeItems.delete(tradeItem.name)
-    } else {
-      this.tradeItems.set(tradeItem.name, newPocketCount)
-    }
-  }
+const refPopupResetSimulation = ref<typeof PopupVue | null>(null)
+const refPopupApplySimulation = ref<typeof PopupVue | null>(null)
+function openPopupResetSimulation() {
+  refPopupResetSimulation.value?.open()
 }
-const pocket = new Pocket()
+function closePopupResetSimulation() {
+  refPopupResetSimulation.value?.close()
+}
+function resetSimulation() {
+  tradeSimulator.reset()
+  closePopupResetSimulation()
+}
+
+function openPopupApplySimulation() {
+  refPopupApplySimulation.value?.open()
+}
+function closePopupApplySimulation() {
+  refPopupApplySimulation.value?.close()
+}
+function applySimulation() {
+  tradeSimulator.save()
+  closePopupApplySimulation()
+}
 </script>
 
 <template>
-  <div class="trade-simulation">
+  <div class="trade-simulation" :visible="visible">
+    <simulator-popup-launcher-vue />
+    <popup-vue ref="refPopupResetSimulation">
+      <div class="popup reset">
+        <p>Q.정말로 시뮬레이션 정보를 초기화 하시겠습니까?</p>
+        <div>
+          <button class="submit" @click.stop="resetSimulation">초기화</button>
+          <button class="cancel" @click.stop="closePopupResetSimulation">
+            취소
+          </button>
+        </div>
+      </div>
+    </popup-vue>
+    <popup-vue ref="refPopupApplySimulation">
+      <div class="popup apply">
+        <p>Q.정말로 시뮬레이션 정보를 주간 교역 정보에 반영 하시겠습니까?</p>
+        <div>
+          <button class="submit" @click.stop="applySimulation">반영</button>
+          <button class="cancel" @click.stop="closePopupApplySimulation">
+            취소
+          </button>
+        </div>
+      </div>
+    </popup-vue>
     <div class="user">
       <h1>교역 수단 정보</h1>
       <div class="select">
@@ -163,11 +179,96 @@ const pocket = new Pocket()
         </p>
       </div>
     </div>
+    <div class="sim-info">
+      <div class="trading-wrap">
+        <h1>시뮬레이션</h1>
+        <p>
+          무게 <span>{{ tradeSimulator.weight }}</span>
+        </p>
+        <p>
+          슬롯 <span>{{ tradeSimulator.slot }}</span>
+        </p>
+        <div class="button-wrap">
+          <button class="submit" @click.stop="openPopupApplySimulation">
+            주간 교역 정보에 추가
+          </button>
+          <button class="reset" @click.stop="openPopupResetSimulation">
+            초기화
+          </button>
+        </div>
+        <div class="sim-trade-item-wrap">
+          <p
+            class="trade-item"
+            v-for="({ tradeItem, count }, idx) in pickedTradeItems"
+            :key="`trade-item-${tradeItem.name}`"
+          >
+            {{ tradeItem.name }} - {{ count }}개(무게:
+            {{ tradeItem.weight * count }} / 슬롯:
+            {{ Math.ceil(count / tradeItem.slotCount) }}칸)
+          </p>
+        </div>
+      </div>
+      <div class="trade-center-wrap">
+        <trade-center-vue
+          v-for="tradeCenter in tradeCenterCollection.getTradeCenters()"
+          :key="`trade-center-${tradeCenter.name}`"
+          visible
+          showName
+          :tradeCenter="tradeCenter"
+          :trade-simulator="tradeSimulator"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .trade-simulation {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  > .popup {
+    .popup {
+      > p {
+        font-size: 20px;
+        letter-spacing: -0.75px;
+        font-weight: 600;
+      }
+
+      > div {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+
+        > button {
+          padding: 4px 8px;
+          color: #fff;
+          border-radius: 4px;
+          &.cancel {
+            background-color: #888;
+          }
+        }
+      }
+
+      &.reset {
+        > div {
+          > button.submit {
+            background-color: #d57;
+          }
+        }
+      }
+      &.apply {
+        > div {
+          > button.submit {
+            background-color: #5a7;
+          }
+        }
+      }
+    }
+  }
   > .user {
     padding: 8px 12px;
     border-radius: 4px;
@@ -190,12 +291,12 @@ const pocket = new Pocket()
         > .grand-master-merchant {
           padding: 4px 8px;
           color: #fff;
-          background-color: #5a7;
+          background-color: #c97;
           border-radius: 4px;
           cursor: pointer;
 
           &[active='true'] {
-            background-color: #c97;
+            background-color: #5a7;
           }
         }
 
@@ -221,6 +322,75 @@ const pocket = new Pocket()
           }
         }
       }
+    }
+  }
+
+  > .sim-info {
+    padding: 12px 0;
+    display: flex;
+    overflow: hidden;
+    gap: 16px;
+
+    > .trading-wrap {
+      flex: 1;
+      overflow: auto;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #acf;
+      display: flex;
+      flex-direction: column;
+
+      > h1 {
+        font-size: 20px;
+        font-weight: 600;
+      }
+      > p {
+        color: #555;
+        font-size: 12px;
+
+        > span {
+          color: #333;
+          font-size: 18px;
+          font-weight: 600;
+        }
+      }
+
+      > .button-wrap {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+
+        > button {
+          padding: 4px 8px;
+          color: #fff;
+          border-radius: 4px;
+          &.submit {
+            background-color: #5a7;
+          }
+          &.reset {
+            background-color: #d57;
+          }
+        }
+      }
+
+      > .sim-trade-item-wrap {
+        flex: 1;
+        overflow: auto;
+        padding: 8px 12px 8px 0;
+        font-size: 14px;
+        font-weight: 500;
+
+        > p {
+          padding: 2px 0;
+        }
+      }
+    }
+
+    > .trade-center-wrap {
+      flex: 1;
+      overflow: auto;
+      padding-right: 8px;
     }
   }
 }

@@ -5,26 +5,19 @@ export interface PopupMsg {
   title?: string
   msgs: string[]
 }
-export class PopupEmitter {
-  private static instance: PopupEmitter | null = null
-  private callbacks: Set<(msgs: PopupMsg) => void> = new Set()
+export class Emitter<T> {
+  private callbacks: Set<(msgs: T) => void> = new Set()
 
-  private constructor() {
-    PopupEmitter.instance = this
-  }
-
-  static getInstance() {
-    if (PopupEmitter.instance === null) return new PopupEmitter()
-    return PopupEmitter.instance
-  }
-
-  on(callback: (popupMsg: PopupMsg) => void) {
+  on(callback: (popupMsg: T) => void) {
     this.callbacks.add(callback)
   }
-  off(callback: (popupMsg: PopupMsg) => void) {
+  off(callback: (popupMsg: T) => void) {
     this.callbacks.delete(callback)
   }
-  emit(popupMsg: PopupMsg) {
+  emit(popupMsg: T) {
     this.callbacks.forEach((callback) => callback(popupMsg))
   }
 }
+
+export const sidePopupListener = new Emitter<PopupMsg>()
+export const simulatorPopupListener = new Emitter<string>()

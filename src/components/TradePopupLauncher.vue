@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
-import { PopupEmitter, PopupMsg } from '@/application/popup.emitter'
+import { PopupMsg, sidePopupListener } from '@/application/popup.emitter'
 import { Queue } from '@/application/queue'
 
 const popupMsgQueue = new Queue<PopupMsg>()
-const sidePopupListener = PopupEmitter.getInstance()
 
 const popupMsgs = ref<PopupMsg[]>(popupMsgQueue.toArray())
 const refPopupLauncher = ref<HTMLElement | null>(null)
@@ -79,10 +78,9 @@ onUnmounted(() => {
 .popup-launcher {
   position: absolute;
   max-width: 40%;
-  min-width: 30%;
+  max-height: 100%;
   top: 0;
   right: 0;
-  bottom: 0;
   overflow: hidden;
 
   > .popup-wrap {

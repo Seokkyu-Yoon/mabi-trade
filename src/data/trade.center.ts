@@ -73,6 +73,10 @@ export class TradeCenterCollection {
     this.tradeCenters.set(name, tradeCenter)
     return this
   }
+
+  getTradeCenters(): TradeCenter[] {
+    return Array.from(this.tradeCenters.values())
+  }
 }
 
 const tradeCenterOasis = TradeCenter.Builder('오아시스')

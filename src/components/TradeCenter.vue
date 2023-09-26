@@ -1,28 +1,35 @@
 <script setup lang="ts">
 import { TradeCenter } from '@/data/trade.center'
+import { TradeItem } from '@/data/trade.item'
 import { computed } from 'vue'
 
-import TradeItem from './TradeItem.vue'
+import TradeItemVue from './TradeItem.vue'
+import { TradeSimulator } from '@/application/trade.simulator'
 
 const props = defineProps<{
+  visible: boolean
   tradeCenter: TradeCenter
   showName: boolean
+  tradeSimulator?: TradeSimulator
 }>()
 
+const visible = computed(() => props.visible)
 const tradeCenter = computed(() => props.tradeCenter)
 const tradeItems = computed(() => tradeCenter.value.getTradeItems())
 const showName = computed(() => props.showName)
+const tradeSimulator = computed(() => props?.tradeSimulator || null)
 </script>
 
 <template>
-  <div class="trade-center">
+  <div class="trade-center" :visible="visible">
     <h1 v-if="showName">
       {{ tradeCenter.name }}
     </h1>
-    <trade-item
+    <trade-item-vue
       v-for="(tradeItem, idx) in tradeItems"
       :key="`${tradeCenter.name}-${idx}`"
       :tradeItem="tradeItem"
+      :tradeSimulator="tradeSimulator"
     />
   </div>
 </template>

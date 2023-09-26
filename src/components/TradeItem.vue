@@ -4,29 +4,33 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { useTradeStore } from '@/stores/trade'
 import { ItemCollection, ItemName } from '@/data/item'
-import { TradeItem, TradeItemCollection } from '@/data/trade.item'
+import { TradeItem } from '@/data/trade.item'
 
-import { PopupEmitter } from '@/application/popup.emitter'
+import { Repeater } from '@/application/repeater'
+import { sidePopupListener } from '@/application/popup.emitter'
+import { TradeSimulator } from '@/application/trade.simulator'
+
+import PopupVue from './Popup.vue'
 
 const itemCollection = ItemCollection.getInstance()
-const tradeItemCollection = TradeItemCollection.getInstance()
 
 const tradeStore = useTradeStore()
 
 const props = defineProps<{
   tradeItem: TradeItem
+  tradeSimulator?: TradeSimulator
 }>()
 
-const sidePopupListener = PopupEmitter.getInstance()
-
 const tradeItem = computed(() => props.tradeItem)
-const traded = computed(() => tradeStore.get(tradeItem.value.name) || 0)
-
+const tradeSimulator = computed(() => props?.tradeSimulator || null)
+const pocketCount = computed(
+  () => tradeSimulator.value?.getCount(tradeItem.value.name) || 0,
+)
+const traded = computed(() => tradeStore.get(tradeItem.value.name))
 const visibleItems = ref(false)
 function toggleVisibleItems() {
   visibleItems.value = !visibleItems.value
 }
-
 function showItemPopup(itemName: ItemName) {
   const item = itemCollection.get(itemName)
   sidePopupListener.emit({
@@ -36,41 +40,22 @@ function showItemPopup(itemName: ItemName) {
   })
 }
 
-class Repeater {
-  private static MAX_DELAY = 150
-  private static MIN_DELAY = 100
-  private timeout: null | ReturnType<typeof setTimeout> = null
-  private callback: () => void
-
-  constructor(callback: () => void) {
-    this.callback = callback
-  }
-
-  run(delay = Repeater.MAX_DELAY) {
-    const currDelay = Math.min(
-      Math.max(delay, Repeater.MIN_DELAY),
-      Repeater.MAX_DELAY,
-    )
-    this.callback()
-    const newDelay = Math.max(currDelay - 10, Repeater.MIN_DELAY)
-    this.timeout = setTimeout(() => {
-      this.run(newDelay)
-    }, currDelay)
-  }
-
-  stop() {
-    if (this.timeout === null) return
-    clearTimeout(this.timeout)
-  }
-}
-const addRepeater = new Repeater(() => {
-  tradeStore.set(
-    tradeItem.value.name,
-    Math.min(traded.value + 1, tradeItem.value.weekendCount),
-  )
+const addStoreRepeater = new Repeater(() => {
+  const savedCount = tradeStore.get(tradeItem.value.name)
+  const newCount = Math.min(savedCount + 1, tradeItem.value.weekendCount)
+  tradeStore.set(tradeItem.value.name, newCount)
 })
-const subRepeater = new Repeater(() => {
-  tradeStore.set(tradeItem.value.name, Math.max(traded.value - 1, 0))
+const subStoreRepeater = new Repeater(() => {
+  const savedCount = tradeStore.get(tradeItem.value.name)
+  const newCount = Math.max(savedCount - 1, 0)
+  tradeStore.set(tradeItem.value.name, newCount)
+})
+
+const addSimulatorRepeater = new Repeater(() => {
+  tradeSimulator.value?.addTradeItem(tradeItem.value)
+})
+const subSimulatorRepeater = new Repeater(() => {
+  tradeSimulator.value?.subTradeItem(tradeItem.value)
 })
 </script>
 
@@ -79,7 +64,7 @@ const subRepeater = new Repeater(() => {
     class="trade-item"
     :active="visibleItems"
     :ended="traded === tradeItem.weekendCount"
-    @mousedown="toggleVisibleItems"
+    @click.stop="toggleVisibleItems"
   >
     <h1>
       {{ tradeItem.name }}
@@ -95,9 +80,10 @@ const subRepeater = new Repeater(() => {
       <div>
         <button
           class="add"
-          @mousedown.stop="() => addRepeater.run()"
-          @mouseup="() => addRepeater.stop()"
-          @mouseleave="() => addRepeater.stop()"
+          @click.stop="() => {}"
+          @mousedown.stop="() => addStoreRepeater.run()"
+          @mouseup="() => addStoreRepeater.stop()"
+          @mouseleave="() => addStoreRepeater.stop()"
         >
           +
         </button>
@@ -105,9 +91,34 @@ const subRepeater = new Repeater(() => {
         <span>({{ tradeItem.weekendCount }})</span>
         <button
           class="sub"
-          @mousedown.stop="() => subRepeater.run()"
-          @mouseup="() => subRepeater.stop()"
-          @mouseleave="() => subRepeater.stop()"
+          @click.stop="() => {}"
+          @mousedown.stop="() => subStoreRepeater.run()"
+          @mouseup="() => subStoreRepeater.stop()"
+          @mouseleave="() => subStoreRepeater.stop()"
+        >
+          -
+        </button>
+      </div>
+    </div>
+    <div class="wrap" v-if="tradeSimulator !== null">
+      <span class="desc">시뮬레이션 구입 횟수</span>
+      <div>
+        <button
+          class="add"
+          @click.stop="() => {}"
+          @mousedown.stop="() => addSimulatorRepeater.run()"
+          @mouseup="() => addSimulatorRepeater.stop()"
+          @mouseleave="() => addSimulatorRepeater.stop()"
+        >
+          +
+        </button>
+        {{ pocketCount }}
+        <button
+          class="sub"
+          @click.stop="() => {}"
+          @mousedown.stop="() => subSimulatorRepeater.run()"
+          @mouseup="() => subSimulatorRepeater.stop()"
+          @mouseleave="() => subSimulatorRepeater.stop()"
         >
           -
         </button>

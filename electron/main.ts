@@ -28,7 +28,7 @@ function createWindow() {
   win.setMenu(
     Menu.buildFromTemplate([
       {
-        label: 'Application',
+        label: 'Menu',
         submenu: [
           {
             label: 'help',
@@ -48,6 +48,7 @@ function createWindow() {
       },
     ]),
   )
+
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
