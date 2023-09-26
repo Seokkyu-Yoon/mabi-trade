@@ -26,7 +26,7 @@ jobs:
       - name: Build Electron App
         run: npm run build:mac # Electron 애플리케이션을 빌드합니다.
 
-       - name: Create Artifact Directory
+      - name: Create Artifact Directory
         run: mkdir release-mac
 
       - name: Copy Build to Artifact Directory
