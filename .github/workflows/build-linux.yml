@@ -28,4 +28,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: release-linux
-          path: dist # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
+          path: linux-release # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
