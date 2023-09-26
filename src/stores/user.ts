@@ -1,31 +1,35 @@
-import { TradeItemName } from '@/data/trade.item'
+import { TradePartnerType } from '@/data/trade.partner'
+import { TradeVehicleName } from '@/data/trade.vehicle'
 import { defineStore } from 'pinia'
 
-const ID = 'tradeStore'
+const ID = 'user'
 const VERSION = 'v0.2'
 
-type Record = [TradeItemName, number]
+class Record {
+  grandMasterMerchant: boolean = false
+  tradePartnerType: TradePartnerType = '없음'
+  tradeVehicleName: TradeVehicleName = '등짐'
+}
 interface StoreParams {
   version: string
-  records: Record[]
+  record: Record
 }
 class StoreData {
   version: string = VERSION
-  records: Map<TradeItemName, number> = new Map()
+  record: Record = new Record()
 
   constructor(params?: StoreParams) {
     this.version = params?.version || VERSION
-    this.records = new Map(params?.records || [])
+    this.record = params?.record || new Record()
   }
 
   toJson(): {
     version: string
-    records: Record[]
+    record: Record
   } {
-    const records: Record[] = Array.from(this.records.entries())
     return {
       version: this.version,
-      records,
+      record: this.record,
     }
   }
 }
@@ -48,13 +52,13 @@ function removeFromStorage() {
   window.localStorage.removeItem(ID)
 }
 
-export const useTradeStore = defineStore(ID, {
-  state: () => {
+export const useUserStore = defineStore(ID, {
+  state() {
     const tradeData = loadFromStorage()
     saveToStorage(tradeData)
     return {
       version: tradeData.version,
-      records: tradeData.records,
+      record: tradeData.record,
     }
   },
   actions: {
@@ -62,15 +66,17 @@ export const useTradeStore = defineStore(ID, {
       removeFromStorage()
       Object.assign(this, loadFromStorage())
     },
-    get(tradeItemName: TradeItemName): number {
-      return this.records.get(tradeItemName) || 0
+    setGrandMasterMerchant(use: boolean) {
+      this.record.grandMasterMerchant = use
+      saveToStorage(new StoreData(this))
     },
-    set(tradeItemName: TradeItemName, count: number) {
-      this.records.set(tradeItemName, count)
-
-      const version = this.version
-      const records: Record[] = Array.from(this.records.entries())
-      saveToStorage(new StoreData({ version, records }))
+    setTradePartnerType(tradePartnerType: TradePartnerType) {
+      this.record.tradePartnerType = tradePartnerType
+      saveToStorage(new StoreData(this))
+    },
+    setTradeVehicleName(tradeVehicleName: TradeVehicleName) {
+      this.record.tradeVehicleName = tradeVehicleName
+      saveToStorage(new StoreData(this))
     },
   },
 })

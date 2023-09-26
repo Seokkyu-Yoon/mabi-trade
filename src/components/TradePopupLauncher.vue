@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
-import { SidePopupListener, PopupMsg } from '@/application/side.popup.listener'
+import { PopupEmitter, PopupMsg } from '@/application/popup.emitter'
 import { Queue } from '@/application/queue'
 
 const popupMsgQueue = new Queue<PopupMsg>()
-const sidePopupListener = SidePopupListener.getInstance()
+const sidePopupListener = PopupEmitter.getInstance()
 
 const popupMsgs = ref<PopupMsg[]>(popupMsgQueue.toArray())
 const refPopupLauncher = ref<HTMLElement | null>(null)

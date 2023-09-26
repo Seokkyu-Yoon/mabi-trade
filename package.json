@@ -5,9 +5,8 @@
   "description": "mabinogi trade program",
   "author": "Seokkyu-Yoon",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build --emptyOutDir && electron-builder",
-    "preview": "vite preview"
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "cross-env NODE_ENV=production vue-tsc --noEmit && vite build --emptyOutDir && electron-builder"
   },
   "dependencies": {
     "pinia": "^2.1.6",
@@ -20,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "@vitejs/plugin-vue": "^4.3.4",
+    "cross-env": "^7.0.3",
     "electron": "^26.1.0",
     "electron-builder": "^24.6.4",
     "eslint": "^8.49.0",

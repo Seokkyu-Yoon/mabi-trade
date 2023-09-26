@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import SidePopupLauncherVue from '@/components/SidePopupLauncher.vue'
-import MainVue from '@/views/Main.vue'
+import TradeVue from '@/views/Trade.vue'
+import HelpVue from '@/views/Help.vue'
+
+import { onMounted, onUnmounted, ref } from 'vue'
+
+const refHelp = ref<typeof HelpVue | null>(null)
+onMounted(() => {
+  window.ipcRenderer.on('event:help', showHelp)
+})
+onUnmounted(() => {
+  window.ipcRenderer.off('event:help', showHelp)
+})
+function showHelp() {
+  refHelp.value?.open()
+}
 </script>
 
 <template>
-  <side-popup-launcher-vue />
-  <main-vue />
+  <help-vue ref="refHelp" />
+  <trade-vue />
 </template>
 
 <style lang="scss">
@@ -36,8 +49,8 @@ li {
 }
 
 a {
-  /* color: inherit;
-  text-decoration: none; */
+  color: inherit;
+  text-decoration: none;
 }
 
 h1 {
@@ -77,5 +90,9 @@ button {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+*[visible='false'] {
+  display: none !important;
 }
 </style>

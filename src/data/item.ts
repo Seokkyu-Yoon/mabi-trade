@@ -121,9 +121,6 @@ export class Item {
       descriptions: string[] = []
       children: Set<Item> = new Set()
 
-      setName(name: ItemName) {
-        this.name = name
-      }
       addChild(item: Item) {
         this.children.add(item)
         return this
@@ -137,16 +134,6 @@ export class Item {
       }
     }
     return new B()
-  }
-
-  addDescription(description: string) {
-    this.descriptions.push(description)
-    return this
-  }
-
-  addChild(item: Item) {
-    this.children.add(item)
-    return this
   }
 }
 

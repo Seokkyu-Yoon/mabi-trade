@@ -5,17 +5,17 @@ export interface PopupMsg {
   title?: string
   msgs: string[]
 }
-export class SidePopupListener {
-  private static instance: SidePopupListener | null = null
+export class PopupEmitter {
+  private static instance: PopupEmitter | null = null
   private callbacks: Set<(msgs: PopupMsg) => void> = new Set()
 
   private constructor() {
-    SidePopupListener.instance = this
+    PopupEmitter.instance = this
   }
 
   static getInstance() {
-    if (SidePopupListener.instance === null) return new SidePopupListener()
-    return SidePopupListener.instance
+    if (PopupEmitter.instance === null) return new PopupEmitter()
+    return PopupEmitter.instance
   }
 
   on(callback: (popupMsg: PopupMsg) => void) {

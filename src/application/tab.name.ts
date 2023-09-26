@@ -1,7 +1,0 @@
-import { Place } from '@/vite-env'
-export type TAB_TYPES = Place | 'all'
-export const TAB_ALL: TAB_TYPES = 'all'
-export const TAB_OASIS: TAB_TYPES = 'oasis'
-export const TAB_KARU_FOREST: TAB_TYPES = 'karuForest'
-export const TAB_KALIDA_LAKE: TAB_TYPES = 'kalidaLake'
-export const TAB_PERA_VOLCANO: TAB_TYPES = 'peraVolcano'

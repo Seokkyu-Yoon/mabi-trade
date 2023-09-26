@@ -20,6 +20,7 @@ declare namespace NodeJS {
     DIST: string
     /** /dist/ or /public/ */
     VITE_PUBLIC: string
+    NODE_ENV: 'development' | 'production'
   }
 }
 
