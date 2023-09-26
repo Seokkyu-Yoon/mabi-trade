@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest # Linux 환경에서 실행합니다.
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }} # GitHub Secrets에서 설정한 시크릿 이름
 
     steps:
       - name: Checkout Repository
