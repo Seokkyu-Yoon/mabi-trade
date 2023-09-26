@@ -26,8 +26,14 @@ jobs:
       - name: Build Electron App
         run: npm run build:linux # Electron 애플리케이션을 빌드합니다.
 
+      - name: Create Artifact Directory
+        run: mkdir release-linux
+
+      - name: Copy Build to Artifact Directory
+        run: cp -r release release-linux
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: release-linux
-          path: linux-release # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
+          path: release-linux # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
