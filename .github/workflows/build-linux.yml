@@ -3,7 +3,7 @@ name: Build for Linux
 on:
   push:
     branches:
-      - main # 변경된 브랜치에 푸시할 때 워크플로우를 실행합니다.
+      - master # 변경된 브랜치에 푸시할 때 워크플로우를 실행합니다.
 
 jobs:
   build:
