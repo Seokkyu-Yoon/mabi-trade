@@ -1,0 +1,31 @@
+name: Build for Linux
+
+on:
+  push:
+    branches:
+      - master # 변경된 브랜치에 푸시할 때 워크플로우를 실행합니다.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Linux 환경에서 실행합니다.
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16 # 사용할 Node.js 버전을 선택합니다.
+
+      - name: Install Dependencies
+        run: npm install # 프로젝트 의존성을 설치합니다.
+
+      - name: Build Electron App
+        run: npm run build:linux # Electron 애플리케이션을 빌드합니다.
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-linux
+          path: linux-release # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
