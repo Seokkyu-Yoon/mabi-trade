@@ -261,8 +261,8 @@ const itemSpinGear = Item.Builder(spinGear)
   .addDescription(
     '힐웬 공학: 힐웬(2), 육각 볼트(40), 육각 너트(40)',
     '- 힐웬: 힐웬 공학: 힐웬 광석 조각(5)',
-    '- 육각 볼트: 힐웬 공학: 무른 힐웬 광석 조각(1)',
-    '- 육각 너트: 힐웬 공학: 무른 힐웬 광석 조각(1)',
+    '- 육각 볼트: 힐웬 공학: 힐웬 광석 조각(1)',
+    '- 육각 너트: 힐웬 공학: 힐웬 광석 조각(1)',
   )
   .build()
 const itemIntermediateFireWood = Item.Builder(intermediateFireWood)
