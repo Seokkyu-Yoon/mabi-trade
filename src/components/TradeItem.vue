@@ -10,8 +10,6 @@ import { Repeater } from '@/application/repeater'
 import { sidePopupListener } from '@/application/popup.emitter'
 import { TradeSimulator } from '@/application/trade.simulator'
 
-import PopupVue from './Popup.vue'
-
 const itemCollection = ItemCollection.getInstance()
 
 const tradeStore = useTradeStore()

@@ -30,8 +30,11 @@ function popWhileOverflow() {
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key.toLowerCase() !== 'd') return
-  hideMsgs(0)
+  if (!e.ctrlKey) return
+  if (e.key.toLowerCase() === 'x') {
+    hideMsgs(0)
+    return
+  }
 }
 onMounted(() => {
   sidePopupListener.on(onPopupMsg)

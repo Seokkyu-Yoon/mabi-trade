@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { TabName } from '@/application/trade.tab'
 
 import { useTradeStore } from '@/stores/trade'
@@ -11,6 +11,8 @@ import TradePopupLauncherVue from '@/components/TradePopupLauncher.vue'
 import TradeCenterTabVue from '@/components/TradeCenterTab.vue'
 import TradeCenterVue from '@/components/TradeCenter.vue'
 import TradeSimulationVue from '@/components/TradeSimulation.vue'
+import ProfitSimulationVue from '@/components/ProfitSimulation.vue'
+import ButtonResetWeeklyVue from '@/components/ButtonResetWeekly.vue'
 
 const tradeStore = useTradeStore()
 const tradeCenterCollection = TradeCenterCollection.getInstance()
@@ -25,7 +27,8 @@ const tabIsOasis = computed(() => tab.value === '오아시스')
 const tabIsKaruForest = computed(() => tab.value === '카루 숲')
 const tabIsKalidaLake = computed(() => tab.value === '칼리다 호수')
 const tabIsPeraVolcano = computed(() => tab.value === '페라 화산')
-const tabIsSimulation = computed(() => tab.value === '시뮬레이션')
+const tabIsTradeSimulation = computed(() => tab.value === '교역 시뮬레이션')
+const tabIsProfitSimulation = computed(() => tab.value === '수익 시뮬레이션')
 
 const visibleOasis = computed(() => tabIsAll.value || tabIsOasis.value)
 const visibleKaruForest = computed(
@@ -37,7 +40,8 @@ const visibleKalidaLake = computed(
 const visiblePeraVolcano = computed(
   () => tabIsAll.value || tabIsPeraVolcano.value,
 )
-const visibleSimulation = computed(() => tabIsSimulation.value)
+const visibleSimulation = computed(() => tabIsTradeSimulation.value)
+const visibleProfitSimulation = computed(() => tabIsProfitSimulation.value)
 
 const refPopupReset = ref<typeof PopupVue | null>(null)
 function openPopupReset() {
@@ -50,6 +54,26 @@ function resetTradeStore() {
   tradeStore.reset()
   closePopupReset()
 }
+
+function onKeydown(e: KeyboardEvent) {
+  if (!refPopupReset.value) return
+  if (!refPopupReset.value?.isShowing()) return
+  const key = e.key.toLowerCase()
+  if (key === 'escape') {
+    closePopupReset()
+    return
+  }
+  if (key === 'enter') {
+    resetTradeStore()
+    return
+  }
+}
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
@@ -65,7 +89,10 @@ function resetTradeStore() {
     </popup-vue>
     <trade-center-tab-vue v-model:name="tab" />
     <trade-popup-launcher-vue />
-    <button class="reset" @click="openPopupReset">주간 교역 정보 초기화</button>
+    <button-reset-weekly-vue
+      :visible="!visibleProfitSimulation"
+      @click="openPopupReset"
+    />
     <div class="con">
       <trade-center-vue
         :visible="visibleOasis"
@@ -88,6 +115,7 @@ function resetTradeStore() {
         :showName="tabIsAll"
       />
       <trade-simulation-vue :visible="visibleSimulation" />
+      <profit-simulation-vue :visible="visibleProfitSimulation" />
     </div>
   </div>
 </template>

@@ -4,6 +4,9 @@ import { ref } from 'vue'
 const visible = ref(false)
 const visibleCon = ref(false)
 
+function isShowing() {
+  return visible.value
+}
 function open() {
   visible.value = true
   openCon()
@@ -20,9 +23,11 @@ function closeCon() {
 }
 
 defineExpose<{
+  isShowing: typeof isShowing
   open: typeof open
   close: typeof closeCon
 }>({
+  isShowing,
   open,
   close: closeCon,
 })

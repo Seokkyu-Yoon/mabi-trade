@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, Menu } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import path from 'node:path'
 
 // The built directory structure
@@ -41,9 +41,10 @@ function createWindow() {
             label: 'quit',
             accelerator: 'CmdOrCtrl+Q',
             click() {
-              app.quit()
+              quit()
             },
           },
+          ...[],
         ],
       },
     ]),
@@ -62,8 +63,19 @@ function createWindow() {
   }
 
   if (nodeEnv === 'development') {
-    globalShortcut.register('CmdOrCtrl+D', () => {
-      win?.webContents.openDevTools()
+    win.webContents.on('before-input-event', (event, input) => {
+      if (input.type !== 'keyDown') return
+      if (
+        input.key === 'F12' ||
+        (input.control && input.shift && input.key.toLowerCase() === 'j')
+      ) {
+        win?.webContents.openDevTools()
+        event.preventDefault()
+      }
+      if (input.control && input.key.toLowerCase() === 'w') {
+        win?.webContents.closeDevTools()
+        event.preventDefault()
+      }
     })
   }
 }
@@ -80,7 +92,7 @@ function quit() {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    quit()
     win = null
   }
 })

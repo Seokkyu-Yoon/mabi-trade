@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { TradeItemCollection } from '@/data/trade.item'
 import { TradePartnerCollection } from '@/data/trade.partner'
 import { TradeVehicleCollection } from '@/data/trade.vehicle'
@@ -112,6 +112,55 @@ function applySimulation() {
   tradeSimulator.save()
   closePopupApplySimulation()
 }
+
+function onKeydown(e: KeyboardEvent) {
+  onKeydownForPopupResetSimulation(e)
+  onKeydownForPopupApplySimulation(e)
+
+  if (!e.ctrlKey) return
+
+  const key = e.key.toLowerCase()
+  if (key === 's') {
+    openPopupApplySimulation()
+    return
+  }
+  if (key === 'd') {
+    openPopupResetSimulation()
+    return
+  }
+}
+function onKeydownForPopupResetSimulation(e: KeyboardEvent) {
+  if (!refPopupResetSimulation.value) return
+  if (!refPopupResetSimulation.value?.isShowing()) return
+  const key = e.key.toLowerCase()
+  if (key === 'escape') {
+    closePopupResetSimulation()
+    return
+  }
+  if (key === 'enter') {
+    resetSimulation()
+    return
+  }
+}
+function onKeydownForPopupApplySimulation(e: KeyboardEvent) {
+  if (!refPopupApplySimulation.value) return
+  if (!refPopupApplySimulation.value?.isShowing()) return
+  const key = e.key.toLowerCase()
+  if (key === 'escape') {
+    closePopupApplySimulation()
+    return
+  }
+  if (key === 'enter') {
+    applySimulation()
+    return
+  }
+}
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
@@ -119,7 +168,7 @@ function applySimulation() {
     <simulator-popup-launcher-vue />
     <popup-vue ref="refPopupResetSimulation">
       <div class="popup reset">
-        <p>Q.정말로 시뮬레이션 정보를 초기화 하시겠습니까?</p>
+        <p>Q.정말로 교역 시뮬레이션 정보를 초기화 하시겠습니까?</p>
         <div>
           <button class="submit" @click.stop="resetSimulation">초기화</button>
           <button class="cancel" @click.stop="closePopupResetSimulation">
@@ -130,7 +179,7 @@ function applySimulation() {
     </popup-vue>
     <popup-vue ref="refPopupApplySimulation">
       <div class="popup apply">
-        <p>Q.정말로 시뮬레이션 정보를 주간 교역 정보에 반영 하시겠습니까?</p>
+        <p>Q.현재 교역 시뮬레이션 정보를 주간 교역 정보에 반영 하시겠습니까?</p>
         <div>
           <button class="submit" @click.stop="applySimulation">반영</button>
           <button class="cancel" @click.stop="closePopupApplySimulation">
@@ -181,7 +230,7 @@ function applySimulation() {
     </div>
     <div class="sim-info">
       <div class="trading-wrap">
-        <h1>시뮬레이션</h1>
+        <h1>교역 시뮬레이션</h1>
         <p>
           무게 <span>{{ tradeSimulator.weight }}</span>
         </p>
@@ -199,7 +248,7 @@ function applySimulation() {
         <div class="sim-trade-item-wrap">
           <p
             class="trade-item"
-            v-for="({ tradeItem, count }, idx) in pickedTradeItems"
+            v-for="{ tradeItem, count } in pickedTradeItems"
             :key="`trade-item-${tradeItem.name}`"
           >
             {{ tradeItem.name }} - {{ count }}개(무게:

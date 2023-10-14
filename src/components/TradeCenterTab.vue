@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TabName } from '@/application/trade.tab'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = defineProps<{
   name: TabName
@@ -27,8 +27,35 @@ const tabs: TabName[] = [
   '카루 숲',
   '칼리다 호수',
   '페라 화산',
-  '시뮬레이션',
+  '교역 시뮬레이션',
+  '수익 시뮬레이션',
 ]
+
+const tabIdx = computed(() => tabs.indexOf(name.value))
+function onKeydown(e: KeyboardEvent) {
+  if (!e.ctrlKey) return
+  const key = e.key.toLowerCase()
+  if (key === 'arrowleft') {
+    const newTabIdx = Math.max(tabIdx.value - 1, 0)
+    const newTabName = tabs[newTabIdx]
+    if (name.value === newTabName) return
+    emitTab(newTabName)
+    return
+  }
+  if (key === 'arrowright') {
+    const newTabIdx = Math.min(tabIdx.value + 1, tabs.length - 1)
+    const newTabName = tabs[newTabIdx]
+    if (name.value === newTabName) return
+    emitTab(newTabName)
+    return
+  }
+}
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
