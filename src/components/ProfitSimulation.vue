@@ -1,51 +1,17 @@
 <script setup lang="ts">
-import {
-  Component,
-  ComponentOptionsBase,
-  ComponentPublicInstance,
-  Ref,
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-} from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 
 import SimulatorPopupLauncherVue from './SimulatorPopupLauncher.vue'
 import PopupVue from './Popup.vue'
+import ProfitItemVue from './ProfitItem.vue'
 
-const SELLER_1 = '티르코네일'
-const SELLER_2 = '던바튼'
-const SELLER_3 = '반호르'
-const SELLER_4 = '이멘마하'
-const SELLER_5 = '탈틴'
-const SELLER_6 = '타라'
-const SELLER_7 = '카브'
-const SELLER_8 = '벨바스트'
-const SELLER_9 = '켈라'
-const SELLER_10 = '필리아'
-const SELLER_11 = '코르'
-const SELLER_12 = '발레스'
-
-type SellerName =
-  | typeof SELLER_1
-  | typeof SELLER_2
-  | typeof SELLER_3
-  | typeof SELLER_4
-  | typeof SELLER_5
-  | typeof SELLER_6
-  | typeof SELLER_7
-  | typeof SELLER_8
-  | typeof SELLER_9
-  | typeof SELLER_10
-  | typeof SELLER_11
-  | typeof SELLER_12
-
-type ProfitInfo = Record<SellerName, number | undefined>
-
-const sellerNames: SellerName[] = [
+import {
+  ProfitInfo,
+  SellerName,
   SELLER_1,
+  SELLER_10,
+  SELLER_11,
+  SELLER_12,
   SELLER_2,
   SELLER_3,
   SELLER_4,
@@ -54,10 +20,25 @@ const sellerNames: SellerName[] = [
   SELLER_7,
   SELLER_8,
   SELLER_9,
-  SELLER_10,
-  SELLER_11,
-  SELLER_12,
-]
+  sellerNames,
+} from '@/data/seller'
+
+function createProfitInfo(): ProfitInfo {
+  return {
+    [SELLER_1]: undefined,
+    [SELLER_2]: undefined,
+    [SELLER_3]: undefined,
+    [SELLER_4]: undefined,
+    [SELLER_5]: undefined,
+    [SELLER_6]: undefined,
+    [SELLER_7]: undefined,
+    [SELLER_8]: undefined,
+    [SELLER_9]: undefined,
+    [SELLER_10]: undefined,
+    [SELLER_11]: undefined,
+    [SELLER_12]: undefined,
+  }
+}
 
 const props = defineProps<{
   visible: boolean
@@ -74,41 +55,33 @@ function closePopupResetSimulation() {
 }
 function resetSimulation() {
   profitInfo2d.splice(0, profitInfo2d.length)
-  nextTick(() => {
-    refProfitNames.value.splice(0, refProfitNames.value.length)
-    closePopupResetSimulation()
-  })
+  closePopupResetSimulation()
+  profitInfoSerial = 0
 }
 
-const refProfitNames = ref<(HTMLElement | null)[]>([])
-function setRefProfitNames(el: HTMLElement | null, rowIdx: number) {
-  refProfitNames.value[rowIdx] = el
-}
-const profitInfo2d = reactive<[string, number | undefined, ProfitInfo][]>([])
+const refProfitItems = ref<(HTMLElement | null)[]>([])
+const profitInfo2d = reactive<
+  {
+    serial: number
+    name: string
+    count: number | undefined
+    info: ProfitInfo
+  }[]
+>([])
+
+let profitInfoSerial = 0
 function addProfitInfo() {
   const idx = profitInfo2d.length
   const name = ''
-  profitInfo2d.push([
+  profitInfo2d.push({
+    serial: profitInfoSerial,
     name,
-    undefined,
-    {
-      [SELLER_1]: undefined,
-      [SELLER_2]: undefined,
-      [SELLER_3]: undefined,
-      [SELLER_4]: undefined,
-      [SELLER_5]: undefined,
-      [SELLER_6]: undefined,
-      [SELLER_7]: undefined,
-      [SELLER_8]: undefined,
-      [SELLER_9]: undefined,
-      [SELLER_10]: undefined,
-      [SELLER_11]: undefined,
-      [SELLER_12]: undefined,
-    },
-  ])
-  refProfitNames.value.push(null)
+    count: undefined,
+    info: createProfitInfo(),
+  })
+  profitInfoSerial += 1
   nextTick(() => {
-    refProfitNames.value[idx]?.focus()
+    refProfitItems.value[idx]?.focus()
   })
 }
 
@@ -121,28 +94,12 @@ const sellerOrderByProfit = computed(() => {
   return profits
 })
 function getProfitBySeller(sellerName: SellerName) {
-  return profitInfo2d.reduce((acc, [_name, count, profitInfo]) => {
-    return acc + (profitInfo[sellerName] || 0) * (count || 0)
+  return profitInfo2d.reduce((acc, { count, info }) => {
+    return acc + (info[sellerName] || 0) * (count || 0)
   }, 0)
 }
 function removeProfitInfo(rowIdx: number) {
   profitInfo2d.splice(rowIdx, 1)
-  refProfitNames.value.splice(rowIdx, 1)
-}
-function resetProfitInfo(rowIdx: number) {
-  resetProfitName(rowIdx)
-  resetProfitCount(rowIdx)
-  sellerNames.forEach((sellerName) => resetProfit(rowIdx, sellerName))
-  refProfitNames.value[rowIdx]?.focus()
-}
-function resetProfitName(rowIdx: number) {
-  profitInfo2d[rowIdx][0] = ''
-}
-function resetProfitCount(rowIdx: number) {
-  profitInfo2d[rowIdx][1] = undefined
-}
-function resetProfit(rowIdx: number, sellerName: SellerName) {
-  profitInfo2d[rowIdx][2][sellerName] = undefined
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -205,53 +162,16 @@ onUnmounted(() => {
     <div class="info trade">
       <h1>교역 정보</h1>
       <div class="item-wrap">
-        <template
-          v-for="([_itemName, _count, profitInfo], rowIdx) in profitInfo2d"
-          :key="`profit-${rowIdx}`"
-        >
-          <div class="item">
-            <div class="row head">
-              <input
-                class="name"
-                :ref="(el) => setRefProfitNames(el as HTMLElement, rowIdx)"
-                type="text"
-                placeholder="품목명"
-                v-model="profitInfo2d[rowIdx][0]"
-                @focus="() => resetProfitName(rowIdx)"
-              />
-              <input
-                class="count"
-                type="number"
-                min="0"
-                placeholder="개수"
-                v-model="profitInfo2d[rowIdx][1]"
-                @focus="() => resetProfitCount(rowIdx)"
-              />
-            </div>
-            <div
-              class="row profit"
-              v-for="(sellerName, idx) in sellerNames"
-              :key="`seller-${idx}`"
-            >
-              <p>- {{ sellerName }}</p>
-              <input
-                type="number"
-                min="0"
-                placeholder="수익"
-                v-model="profitInfo2d[rowIdx][2][sellerName]"
-                @focus="() => resetProfit(rowIdx, sellerName)"
-              />
-            </div>
-            <div class="row button-wrap">
-              <button class="delete" @click="() => removeProfitInfo(rowIdx)">
-                삭제
-              </button>
-              <button class="reset" @click="() => resetProfitInfo(rowIdx)">
-                초기화
-              </button>
-            </div>
-          </div>
-        </template>
+        <profit-item-vue
+          v-for="(profitInfo, profitIdx) in profitInfo2d"
+          :key="`profit-${profitInfo.serial}`"
+          ref="refProfitItems"
+          :idx="profitIdx"
+          v-model:name="profitInfo2d[profitIdx].name"
+          v-model:count="profitInfo2d[profitIdx].count"
+          v-model:profitInfos="profitInfo2d[profitIdx].info"
+          @click:delete="removeProfitInfo"
+        />
       </div>
     </div>
 
@@ -360,78 +280,6 @@ onUnmounted(() => {
         display: flex;
         overflow: auto hidden;
         gap: 4px;
-
-        > .item {
-          padding: 4px 8px;
-          border-radius: 4px;
-          border: 1px solid #ccc;
-          white-space: pre;
-          > .row {
-            padding: 2px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: -0.5px;
-            gap: 8px;
-
-            > input {
-              flex: 1;
-              padding: 4px 8px;
-              max-width: 0;
-              min-width: 50px;
-              font-size: 12px;
-              background: #eee;
-              border-radius: 2px;
-              border: none;
-
-              &[type='number'] {
-                &::-webkit-inner-spin-button,
-                &::-webkit-outer-spin-button {
-                  -webkit-appearance: none;
-                  margin: 0;
-                }
-              }
-              &.name {
-                font-size: 14px;
-                font-weight: bold;
-                letter-spacing: -0.75px;
-                min-width: 150px;
-              }
-            }
-
-            &.button-wrap {
-              padding: 4px 0;
-
-              > button {
-                padding: 2px 4px;
-                border-radius: 4px;
-                font-weight: 500;
-
-                &.delete {
-                  border: 1px solid #d57;
-                  color: #d57;
-                  background-color: #fff;
-
-                  &:hover {
-                    color: #fff;
-                    background-color: #d57;
-                  }
-                }
-                &.reset {
-                  border: 1px solid #c97;
-                  color: #c97;
-
-                  &:hover {
-                    background-color: #c97;
-                    color: #fff;
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     }
 
