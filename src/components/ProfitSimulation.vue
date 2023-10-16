@@ -133,6 +133,7 @@ function resetProfitInfo(rowIdx: number) {
   resetProfitName(rowIdx)
   resetProfitCount(rowIdx)
   sellerNames.forEach((sellerName) => resetProfit(rowIdx, sellerName))
+  refProfitNames.value[rowIdx]?.focus()
 }
 function resetProfitName(rowIdx: number) {
   profitInfo2d[rowIdx][0] = ''
@@ -232,7 +233,7 @@ onUnmounted(() => {
               v-for="(sellerName, idx) in sellerNames"
               :key="`seller-${idx}`"
             >
-              <p>{{ sellerName }}</p>
+              <p>- {{ sellerName }}</p>
               <input
                 type="number"
                 min="0"
@@ -242,8 +243,12 @@ onUnmounted(() => {
               />
             </div>
             <div class="row button-wrap">
-              <button @click="() => removeProfitInfo(rowIdx)">삭제</button>
-              <button @click="() => resetProfitInfo(rowIdx)">초기화</button>
+              <button class="delete" @click="() => removeProfitInfo(rowIdx)">
+                삭제
+              </button>
+              <button class="reset" @click="() => resetProfitInfo(rowIdx)">
+                초기화
+              </button>
             </div>
           </div>
         </template>
@@ -252,15 +257,15 @@ onUnmounted(() => {
 
     <div class="info result">
       <h1>집계</h1>
-      <label
-        v-for="[sellerName, profit] in sellerOrderByProfit"
-        :key="`result-${sellerName}`"
-      >
-        {{ sellerName }}
-        <span>
-          {{ profit }}
-        </span>
-      </label>
+      <div class="item-wrap">
+        <label
+          v-for="[sellerName, profit] in sellerOrderByProfit"
+          :key="`result-${sellerName}`"
+        >
+          {{ sellerName }}
+          <span>{{ profit }}</span>
+        </label>
+      </div>
     </div>
   </div>
 </template>
@@ -316,11 +321,24 @@ onUnmounted(() => {
       padding: 4px 8px;
       color: #fff;
       border-radius: 4px;
+      font-weight: 500;
       &.submit {
-        background-color: #5a7;
+        border: 1px solid #5a7;
+        color: #5a7;
+
+        &:hover {
+          background-color: #5a7;
+          color: #fff;
+        }
       }
       &.reset {
-        background-color: #d57;
+        border: 1px solid #d57;
+        color: #d57;
+
+        &:hover {
+          background-color: #d57;
+          color: #fff;
+        }
       }
     }
   }
@@ -338,26 +356,102 @@ onUnmounted(() => {
 
     &.trade {
       > .item-wrap {
+        padding: 4px 0;
         display: flex;
         overflow: auto hidden;
+        gap: 4px;
 
         > .item {
+          padding: 4px 8px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
           white-space: pre;
           > .row {
+            padding: 2px 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: -0.5px;
             gap: 8px;
 
             > input {
               flex: 1;
+              padding: 4px 8px;
               max-width: 0;
               min-width: 50px;
+              font-size: 12px;
+              background: #eee;
+              border-radius: 2px;
+              border: none;
 
+              &[type='number'] {
+                &::-webkit-inner-spin-button,
+                &::-webkit-outer-spin-button {
+                  -webkit-appearance: none;
+                  margin: 0;
+                }
+              }
               &.name {
-                width: 200px;
+                font-size: 14px;
+                font-weight: bold;
+                letter-spacing: -0.75px;
+                min-width: 150px;
               }
             }
+
+            &.button-wrap {
+              padding: 4px 0;
+
+              > button {
+                padding: 2px 4px;
+                border-radius: 4px;
+                font-weight: 500;
+
+                &.delete {
+                  border: 1px solid #d57;
+                  color: #d57;
+                  background-color: #fff;
+
+                  &:hover {
+                    color: #fff;
+                    background-color: #d57;
+                  }
+                }
+                &.reset {
+                  border: 1px solid #c97;
+                  color: #c97;
+
+                  &:hover {
+                    background-color: #c97;
+                    color: #fff;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.result {
+      > .item-wrap {
+        padding: 4px 0px;
+        display: flex;
+        overflow: auto hidden;
+        gap: 8px;
+
+        > label {
+          white-space: nowrap;
+          padding: 4px 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-weight: 600;
+          letter-spacing: -0.5px;
+
+          > span {
+            font-weight: 500;
           }
         }
       }

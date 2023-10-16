@@ -78,10 +78,12 @@ onUnmounted(() => {
 
   > button {
     padding: 4px 8px;
-    background-color: #ccc;
+    border: 1px solid #57f;
+    color: #57f;
     border-radius: 4px;
     font-weight: 500;
 
+    &:hover,
     &[active='true'] {
       background-color: #57f;
       color: #fff;

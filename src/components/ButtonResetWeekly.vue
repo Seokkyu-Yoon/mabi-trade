@@ -37,9 +37,15 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .btn-reset-weekly {
   margin-right: auto;
-  background-color: #d57;
+  border: 1px solid #d57;
+  color: #d57;
   padding: 4px 8px;
-  color: #fff;
   border-radius: 4px;
+  font-weight: 500;
+
+  &:hover {
+    background-color: #d57;
+    color: #fff;
+  }
 }
 </style>

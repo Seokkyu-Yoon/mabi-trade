@@ -216,15 +216,27 @@ const subSimulatorRepeater = new Repeater(() => {
         justify-content: center;
         width: 18px;
         height: 18px;
-        color: #fff;
         border-radius: 4px;
+        font-weight: 500;
 
         &.add {
-          background-color: #5a7;
+          border: 1px solid #5a7;
+          color: #5a7;
+
+          &:hover {
+            background-color: #5a7;
+            color: #fff;
+          }
         }
 
         &.sub {
-          background-color: #c97;
+          border: 1px solid #c97;
+          color: #c97;
+
+          &:hover {
+            background-color: #c97;
+            color: #fff;
+          }
         }
       }
 

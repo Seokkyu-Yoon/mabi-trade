@@ -196,7 +196,7 @@ onUnmounted(() => {
           :active="isGrandMasterMerchant"
           @click="toggleGrandMasterMerchat"
         >
-          그랜마 상인 적용 ({{ isGrandMasterMerchant ? 'O' : 'X' }})
+          그랜마 상인
         </label>
 
         <select v-model="tradeVehicleName">
@@ -294,10 +294,17 @@ onUnmounted(() => {
 
         > button {
           padding: 4px 8px;
-          color: #fff;
           border-radius: 4px;
+          font-weight: 500;
+
           &.cancel {
-            background-color: #888;
+            border: 1px solid #888;
+            color: #888;
+
+            &:hover {
+              background-color: #888;
+              color: #fff;
+            }
           }
         }
       }
@@ -305,14 +312,26 @@ onUnmounted(() => {
       &.reset {
         > div {
           > button.submit {
-            background-color: #d57;
+            border: 1px solid #d57;
+            color: #d57;
+
+            &:hover {
+              background-color: #d57;
+              color: #fff;
+            }
           }
         }
       }
       &.apply {
         > div {
           > button.submit {
-            background-color: #5a7;
+            border: 1px solid #5a7;
+            color: #5a7;
+
+            &:hover {
+              background-color: #5a7;
+              color: #fff;
+            }
           }
         }
       }
@@ -339,13 +358,15 @@ onUnmounted(() => {
 
         > .grand-master-merchant {
           padding: 4px 8px;
-          color: #fff;
-          background-color: #c97;
+          border: 1px solid #5a7;
+          color: #5a7;
           border-radius: 4px;
           cursor: pointer;
 
+          &:hover,
           &[active='true'] {
             background-color: #5a7;
+            color: #fff;
           }
         }
 
@@ -414,11 +435,24 @@ onUnmounted(() => {
           padding: 4px 8px;
           color: #fff;
           border-radius: 4px;
+          font-weight: 500;
+
           &.submit {
-            background-color: #5a7;
+            border: 1px solid #5a7;
+            color: #5a7;
+
+            &:hover {
+              background-color: #5a7;
+              color: #fff;
+            }
           }
           &.reset {
-            background-color: #d57;
+            border: 1px solid #d57;
+            color: #d57;
+            &:hover {
+              background-color: #d57;
+              color: #fff;
+            }
           }
         }
       }
