@@ -10,11 +10,14 @@ const emits = defineEmits([
 ])
 
 const props = defineProps<{
+  readonly?: boolean
   idx: number
   name: string
   count: number | undefined
   profitInfos: ProfitInfo
 }>()
+
+const readonly = ref(props.readonly || false)
 
 const valueName = ref(props.name)
 watch(valueName, (newName) => {
@@ -49,6 +52,7 @@ function resetItem() {
   sellerNames.forEach((sellerName) => {
     resetProfit(sellerName)
   })
+  refName.value?.focus()
 }
 
 const refName = ref<HTMLInputElement | null>(null)
@@ -60,7 +64,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="profit-item">
+  <div class="profit-item" :readonly="readonly">
     <div class="row head">
       <input
         class="name"
@@ -89,13 +93,18 @@ defineExpose({
         type="number"
         min="0"
         placeholder="수익"
+        :readonly="readonly"
         v-model="valueProfitInfos[sellerName]"
         @focus="() => resetProfit(sellerName)"
       />
     </div>
     <div class="row button-wrap">
-      <button class="delete" @click="deleteItem">삭제</button>
-      <button class="reset" @click="resetItem">초기화</button>
+      <button class="delete" @click="deleteItem" :readonly="readonly">
+        삭제
+      </button>
+      <button class="reset" @click="resetItem" :readonly="readonly">
+        초기화
+      </button>
     </div>
   </div>
 </template>
@@ -105,7 +114,13 @@ defineExpose({
   padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid #ccc;
+  background-color: #fff;
   white-space: pre;
+
+  &[readonly] {
+    pointer-events: none;
+  }
+
   > .row {
     padding: 2px 4px;
     display: flex;

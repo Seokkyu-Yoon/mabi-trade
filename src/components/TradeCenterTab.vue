@@ -36,14 +36,14 @@ function onKeydown(e: KeyboardEvent) {
   if (!e.ctrlKey) return
   const key = e.key.toLowerCase()
   if (key === 'arrowleft') {
-    const newTabIdx = Math.max(tabIdx.value - 1, 0)
+    const newTabIdx = (tabs.length + tabIdx.value - 1) % tabs.length
     const newTabName = tabs[newTabIdx]
     if (name.value === newTabName) return
     emitTab(newTabName)
     return
   }
   if (key === 'arrowright') {
-    const newTabIdx = Math.min(tabIdx.value + 1, tabs.length - 1)
+    const newTabIdx = (tabIdx.value + 1) % tabs.length
     const newTabName = tabs[newTabIdx]
     if (name.value === newTabName) return
     emitTab(newTabName)

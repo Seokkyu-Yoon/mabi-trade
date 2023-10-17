@@ -65,6 +65,8 @@ onUnmounted(() => {
           <p class="tit">- 단축키(수익 시뮬레이션)</p>
           <p>Ctrl + A / Cmd + A - 교역품을 추가합니다.</p>
           <p>Ctrl + D / Cmd + D - 시뮬레이션 정보를 초기화합니다.</p>
+          <p>Ctrl + Z / Cmd + Z - 왼쪽 교역정보를 선택합니다.</p>
+          <p>Ctrl + X / Cmd + X - 오른쪽 교역정보를 선택합니다.</p>
 
           <p class="tit">- 단축키(팝업)</p>
           <p>Enter - 해당 작업을 진행합니다.</p>

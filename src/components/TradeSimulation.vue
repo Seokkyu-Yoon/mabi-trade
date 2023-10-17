@@ -114,6 +114,7 @@ function applySimulation() {
 }
 
 function onKeydown(e: KeyboardEvent) {
+  if (!visible.value) return
   onKeydownForPopupResetSimulation(e)
   onKeydownForPopupApplySimulation(e)
 

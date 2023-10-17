@@ -4,6 +4,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import SimulatorPopupLauncherVue from './SimulatorPopupLauncher.vue'
 import PopupVue from './Popup.vue'
 import ProfitItemVue from './ProfitItem.vue'
+import CarouselVue from './Carousel.vue'
 
 import {
   ProfitInfo,
@@ -46,7 +47,9 @@ const props = defineProps<{
 
 const visible = computed(() => props.visible)
 
-const refPopupResetSimulation = ref<typeof PopupVue | null>(null)
+const refPopupResetSimulation = ref<InstanceType<typeof PopupVue> | null>(null)
+const refCarousel = ref<InstanceType<typeof CarouselVue> | null>(null)
+
 function openPopupResetSimulation() {
   refPopupResetSimulation.value?.open()
 }
@@ -57,9 +60,13 @@ function resetSimulation() {
   profitInfo2d.splice(0, profitInfo2d.length)
   closePopupResetSimulation()
   profitInfoSerial = 0
+  refCarousel.value?.reset()
+  nextTick(() => {
+    refProfitItems.value.splice(0, refProfitItems.value.length)
+  })
 }
 
-const refProfitItems = ref<(HTMLElement | null)[]>([])
+const refProfitItems = ref<(InstanceType<typeof ProfitItemVue> | null)[]>([])
 const profitInfo2d = reactive<
   {
     serial: number
@@ -68,6 +75,7 @@ const profitInfo2d = reactive<
     info: ProfitInfo
   }[]
 >([])
+const profitInfo2dIdx = ref(0)
 
 let profitInfoSerial = 0
 function addProfitInfo() {
@@ -80,6 +88,8 @@ function addProfitInfo() {
     info: createProfitInfo(),
   })
   profitInfoSerial += 1
+  refProfitItems.value.push(null)
+  refCarousel.value?.setIdx(idx)
   nextTick(() => {
     refProfitItems.value[idx]?.focus()
   })
@@ -100,9 +110,12 @@ function getProfitBySeller(sellerName: SellerName) {
 }
 function removeProfitInfo(rowIdx: number) {
   profitInfo2d.splice(rowIdx, 1)
+  refProfitItems.value.splice(rowIdx, 1)
+  refCarousel.value?.onRemove(rowIdx)
 }
 
 function onKeydown(e: KeyboardEvent) {
+  if (!visible.value) return
   onKeydownForPopupResetSimulation(e)
 
   if (!e.ctrlKey) return
@@ -113,6 +126,14 @@ function onKeydown(e: KeyboardEvent) {
   }
   if (key === 'd') {
     openPopupResetSimulation()
+    return
+  }
+  if (key === 'z') {
+    refCarousel.value?.setIdx(profitInfo2dIdx.value - 1)
+    return
+  }
+  if (key === 'x') {
+    refCarousel.value?.setIdx(profitInfo2dIdx.value + 1)
     return
   }
 }
@@ -162,16 +183,59 @@ onUnmounted(() => {
     <div class="info trade">
       <h1>교역 정보</h1>
       <div class="item-wrap">
-        <profit-item-vue
-          v-for="(profitInfo, profitIdx) in profitInfo2d"
-          :key="`profit-${profitInfo.serial}`"
-          ref="refProfitItems"
-          :idx="profitIdx"
-          v-model:name="profitInfo2d[profitIdx].name"
-          v-model:count="profitInfo2d[profitIdx].count"
-          v-model:profitInfos="profitInfo2d[profitIdx].info"
-          @click:delete="removeProfitInfo"
-        />
+        <carousel-vue
+          ref="refCarousel"
+          v-model:items="profitInfo2d"
+          v-model:idx="profitInfo2dIdx"
+        >
+          <template v-slot:left="{ idx }">
+            <profit-item-vue
+              :key="`profit-${profitInfo2d[idx].serial}`"
+              :ref="
+                (el) => {
+                  refProfitItems[idx] = el as InstanceType<typeof ProfitItemVue>
+                }
+              "
+              readonly
+              :idx="idx"
+              v-model:name="profitInfo2d[idx].name"
+              v-model:count="profitInfo2d[idx].count"
+              v-model:profitInfos="profitInfo2d[idx].info"
+              @click:delete="removeProfitInfo"
+            />
+          </template>
+          <template v-slot:right="{ idx }">
+            <profit-item-vue
+              :key="`profit-${profitInfo2d[idx].serial}`"
+              :ref="
+                (el) => {
+                  refProfitItems[idx] = el as InstanceType<typeof ProfitItemVue>
+                }
+              "
+              readonly
+              :idx="idx"
+              v-model:name="profitInfo2d[idx].name"
+              v-model:count="profitInfo2d[idx].count"
+              v-model:profitInfos="profitInfo2d[idx].info"
+              @click:delete="removeProfitInfo"
+            />
+          </template>
+          <template v-slot="{ idx }">
+            <profit-item-vue
+              :key="`profit-${profitInfo2d[idx].serial}`"
+              :ref="
+                (el) => {
+                  refProfitItems[idx] = el as InstanceType<typeof ProfitItemVue>
+                }
+              "
+              :idx="idx"
+              v-model:name="profitInfo2d[idx].name"
+              v-model:count="profitInfo2d[idx].count"
+              v-model:profitInfos="profitInfo2d[idx].info"
+              @click:delete="removeProfitInfo"
+            />
+          </template>
+        </carousel-vue>
       </div>
     </div>
 
@@ -179,6 +243,7 @@ onUnmounted(() => {
       <h1>집계</h1>
       <div class="item-wrap">
         <label
+          class="item"
           v-for="[sellerName, profit] in sellerOrderByProfit"
           :key="`result-${sellerName}`"
         >
@@ -290,13 +355,14 @@ onUnmounted(() => {
         overflow: auto hidden;
         gap: 8px;
 
-        > label {
+        .item {
           white-space: nowrap;
           padding: 4px 8px;
           border: 1px solid #ccc;
           border-radius: 4px;
           font-weight: 600;
           letter-spacing: -0.5px;
+          background-color: #fff;
 
           > span {
             font-weight: 500;
