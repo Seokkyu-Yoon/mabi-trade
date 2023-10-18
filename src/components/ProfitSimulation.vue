@@ -90,6 +90,7 @@ function addProfitInfo() {
   profitInfoSerial += 1
   refProfitItems.value.push(null)
   refCarousel.value?.setIdx(idx)
+  refCarousel.value?.onAdd()
   nextTick(() => {
     refProfitItems.value[idx]?.focus()
   })
