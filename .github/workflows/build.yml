@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: ['windows', 'ubuntu', 'mac']
+        os: ['windows', 'linux', 'mac']
         include:
           - os: windows
             runs-on: windows-latest
