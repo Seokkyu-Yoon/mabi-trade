@@ -13,13 +13,12 @@ jobs:
         include:
           - os: windows
             runs-on: windows-latest
-            release-path: win-unpacked/MabiTrade.exe
+
           - os: linux
             runs-on: ubuntu-latest
-            release-path: linux-unpacked/mabi-trade
+
           - os: mac
             runs-on: macos-latest
-            release-path: mac/MabiTrade.app
 
     runs-on: ${{ matrix.runs-on }}
 
@@ -45,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: release-${{ matrix.os }}
-          path: release/${{ matrix.release-path }} # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
+          path: release # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
