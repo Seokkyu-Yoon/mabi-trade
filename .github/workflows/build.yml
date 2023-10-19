@@ -1,13 +1,23 @@
-name: Build for mac
+name: Build
 
 on:
   push:
     branches:
-      - master # 변경된 브랜치에 푸시할 때 워크플로우를 실행합니다.
+      - master
 
 jobs:
   build:
-    runs-on: macos-latest # mac 환경에서 실행합니다.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        release-path:
+          [
+            'win-unpacked/MabiTrade.exe',
+            'linux-unpacked/mabi-trade',
+            'mac/MabiTrade.app',
+          ]
+
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }} # GitHub Secrets에서 설정한 시크릿 이름
 
@@ -24,16 +34,10 @@ jobs:
         run: npm install # 프로젝트 의존성을 설치합니다.
 
       - name: Build Electron App
-        run: npm run build:mac # Electron 애플리케이션을 빌드합니다.
-
-      # - name: Create Artifact Directory
-      #   run: mkdir release-mac
-
-      # - name: Copy Build to Artifact Directory
-      #   run: cp -r release release-mac
+        run: npm run build:${{ matrix.os }} # Electron 애플리케이션을 빌드합니다.
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: release-mac
-          path: release/mac/MabiTrade.app # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
+          name: release-${{ matrix.os }}
+          path: release/${{ matrix.release-path }} # 빌드된 애플리케이션 파일을 아티팩트로 업로드합니다.
