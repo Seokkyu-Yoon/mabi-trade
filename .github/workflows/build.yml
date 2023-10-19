@@ -9,14 +9,18 @@ jobs:
   build:
     strategy:
       matrix:
-        runs-on: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-        os: ['windows', 'linux', 'mac']
-        release-path:
-          [
-            'win-unpacked/MabiTrade.exe',
-            'linux-unpacked/mabi-trade',
-            'mac/MabiTrade.app',
-          ]
+        os: ['windows', 'ubuntu', 'mac']
+        include:
+          - os: windows
+            runs-on: windows-latest
+            release-path: win-unpacked/MabiTrade.exe
+          - os: linux
+            runs-on: ubuntu-latest
+            release-path: linux-unpacked/mabi-trade
+          - os: mac
+            runs-on: macos-latest
+            release-path: mac/MabiTrade.app
+
     runs-on: ${{ matrix.runs-on }}
 
     env:
