@@ -5,7 +5,7 @@ const props = defineProps<{
   idx?: number
   items: any[]
 }>()
-const emits = defineEmits(['update:idx', 'update:items'])
+const emits = defineEmits(['update:idx'])
 
 const items = computed(() => props.items)
 

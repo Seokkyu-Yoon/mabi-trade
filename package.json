@@ -49,5 +49,12 @@
   "linux": {
     "target": "AppImage"
   },
-  "main": "dist-electron/main.js"
+  "main": "dist-electron/main.js",
+  "build": {
+    "appId": "com.sky.mabi.trade",
+    "productName": "MabiTrade",
+    "directories": {
+      "output": "release"
+    }
+  }
 }

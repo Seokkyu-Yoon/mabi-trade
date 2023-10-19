@@ -186,8 +186,8 @@ onUnmounted(() => {
       <div class="item-wrap">
         <carousel-vue
           ref="refCarousel"
-          v-model:items="profitInfo2d"
           v-model:idx="profitInfo2dIdx"
+          :items="profitInfo2d"
         >
           <template v-slot:left="{ idx }">
             <profit-item-vue
